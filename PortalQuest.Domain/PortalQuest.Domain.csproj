@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Entities\Blog\" />
+    <Folder Include="Entities\Community\" />
+  </ItemGroup>
 </Project>
