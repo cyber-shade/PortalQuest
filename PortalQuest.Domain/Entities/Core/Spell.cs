@@ -10,7 +10,8 @@ public class Spell : BaseCoreEntity
 	public int Level { get; set; }
 	public bool Ritual { get; set; }
 	public bool Concentration { get; set; }
-	public Dictionary<string,int> DamageDices { get; set; }
+	[Column(TypeName = "jsonb")]
+	public string DamageDices { get; set; }
 	#region Relation
 	public int MagicSchoolId { get; set; }
 	[ForeignKey(nameof(MagicSchoolId))]
