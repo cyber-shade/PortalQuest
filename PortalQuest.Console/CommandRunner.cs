@@ -6,6 +6,7 @@ public class CommandRunner(IEnumerable<IConsoleCommand> commands)
 		System.Console.WriteLine("PortalQuest Console Utility");
 		IConsoleCommand? command = null;
 		while (command == null) {
+			System.Console.WriteLine("\nEnter Command");
 			var commandName = System.Console.ReadLine()?.Trim();
 			if (string.IsNullOrEmpty(commandName))
 			{
@@ -13,7 +14,7 @@ public class CommandRunner(IEnumerable<IConsoleCommand> commands)
 				continue;
 			}
 			command = commands.FirstOrDefault(x => x.Name == commandName);
-			if (command == null)
+				if (command == null)
 			{
 				System.Console.WriteLine("Command Not Found");
 				continue;

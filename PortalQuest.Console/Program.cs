@@ -11,6 +11,7 @@ builder.ConfigureServices((context, services) => {
 	services.AddApplicationServices();
 	services.AddPersistenceServices(context.Configuration);
 	services.AddTransient<IConsoleCommand, GetSpellsCommand>();
+	services.AddTransient<CommandRunner>();
 });
 var app = builder.Build();
 
