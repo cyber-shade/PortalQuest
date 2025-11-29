@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,39 +12,11 @@ namespace PortalQuest.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AbilityScores",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AbilityScores", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AttackTypes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AttackTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CastingTime",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -57,8 +29,8 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Classes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -71,8 +43,8 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Components",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -85,8 +57,8 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Conditions",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -96,25 +68,25 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DamageTypes",
+                name: "DamageType",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DamageTypes", x => x.Id);
+                    table.PrimaryKey("PK_DamageType", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Durations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -127,8 +99,8 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Effects",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -138,25 +110,11 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MagicSchools",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MagicSchools", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Ranges",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -169,8 +127,8 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Tags",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
@@ -183,36 +141,26 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Spells",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Level = table.Column<int>(type: "integer", nullable: false),
                     Ritual = table.Column<bool>(type: "boolean", nullable: false),
                     Concentration = table.Column<bool>(type: "boolean", nullable: false),
                     DamageDices = table.Column<string>(type: "jsonb", nullable: false),
-                    MagicSchoolId = table.Column<int>(type: "integer", nullable: false),
-                    SaveId = table.Column<int>(type: "integer", nullable: true),
-                    CastingTimeId = table.Column<int>(type: "integer", nullable: false),
-                    DurationId = table.Column<int>(type: "integer", nullable: false),
-                    DamageTypeId = table.Column<int>(type: "integer", nullable: true),
-                    ConditionId = table.Column<int>(type: "integer", nullable: true),
-                    RangeId = table.Column<int>(type: "integer", nullable: false),
-                    AttackTypeId = table.Column<int>(type: "integer", nullable: true),
+                    MagicSchool = table.Column<int>(type: "integer", nullable: false),
+                    Save = table.Column<int>(type: "integer", nullable: true),
+                    AttackType = table.Column<int>(type: "integer", nullable: true),
+                    CastingTimeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DamageTypeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    ConditionId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RangeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Spells", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Spells_AbilityScores_SaveId",
-                        column: x => x.SaveId,
-                        principalTable: "AbilityScores",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Spells_AttackTypes_AttackTypeId",
-                        column: x => x.AttackTypeId,
-                        principalTable: "AttackTypes",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Spells_CastingTime_CastingTimeId",
                         column: x => x.CastingTimeId,
@@ -225,20 +173,14 @@ namespace PortalQuest.Persistence.Migrations
                         principalTable: "Conditions",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Spells_DamageTypes_DamageTypeId",
+                        name: "FK_Spells_DamageType_DamageTypeId",
                         column: x => x.DamageTypeId,
-                        principalTable: "DamageTypes",
+                        principalTable: "DamageType",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Spells_Durations_DurationId",
                         column: x => x.DurationId,
                         principalTable: "Durations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Spells_MagicSchools_MagicSchoolId",
-                        column: x => x.MagicSchoolId,
-                        principalTable: "MagicSchools",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -253,10 +195,9 @@ namespace PortalQuest.Persistence.Migrations
                 name: "SpellClass",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SpellId = table.Column<int>(type: "integer", nullable: false),
-                    ClassId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SpellId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -279,10 +220,9 @@ namespace PortalQuest.Persistence.Migrations
                 name: "SpellTag",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SpellId = table.Column<int>(type: "integer", nullable: false),
-                    TagId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    SpellId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TagId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -322,11 +262,6 @@ namespace PortalQuest.Persistence.Migrations
                 column: "TagId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Spells_AttackTypeId",
-                table: "Spells",
-                column: "AttackTypeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Spells_CastingTimeId",
                 table: "Spells",
                 column: "CastingTimeId");
@@ -347,19 +282,9 @@ namespace PortalQuest.Persistence.Migrations
                 column: "DurationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Spells_MagicSchoolId",
-                table: "Spells",
-                column: "MagicSchoolId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Spells_RangeId",
                 table: "Spells",
                 column: "RangeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Spells_SaveId",
-                table: "Spells",
-                column: "SaveId");
         }
 
         /// <inheritdoc />
@@ -387,25 +312,16 @@ namespace PortalQuest.Persistence.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "AbilityScores");
-
-            migrationBuilder.DropTable(
-                name: "AttackTypes");
-
-            migrationBuilder.DropTable(
                 name: "CastingTime");
 
             migrationBuilder.DropTable(
                 name: "Conditions");
 
             migrationBuilder.DropTable(
-                name: "DamageTypes");
+                name: "DamageType");
 
             migrationBuilder.DropTable(
                 name: "Durations");
-
-            migrationBuilder.DropTable(
-                name: "MagicSchools");
 
             migrationBuilder.DropTable(
                 name: "Ranges");
