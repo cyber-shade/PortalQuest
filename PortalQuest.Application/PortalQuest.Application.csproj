@@ -14,4 +14,8 @@
     <ProjectReference Include="..\PortalQuest.Domain\PortalQuest.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\Core\" />
+  </ItemGroup>
+
 </Project>

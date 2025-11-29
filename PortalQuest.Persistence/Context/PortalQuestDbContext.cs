@@ -45,6 +45,19 @@ public class PortalQuestDbContext : DbContext
 				(c1, c2) => c1.SequenceEqual(c2),               // Compare dictionaries
 				c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())), // Hash code
 				c => new Dictionary<string, int>(c)));          // Deep copy for snapshotting
+
+		#region IsDeleted Global Query Filter
+		modelBuilder.Entity<CastingTime>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Class>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<DamageType>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Duration>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Effect>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Domain.Entities.Core.Range>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Spell>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Tag>().HasQueryFilter(x => !x.IsDeleted);
+		#endregion
 	}
 	#endregion
 }
