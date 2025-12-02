@@ -13,13 +13,9 @@ public class PortalQuestDbContext : DbContext
      
     }
 	#region Core
-    public DbSet<CastingTime>  CastingTime { get; set; }
     public DbSet<Class> Classes { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<Condition> Conditions { get; set; }
-    public DbSet<Duration> Durations { get; set; } 
-    public DbSet<Effect> Effects { get; set; }
-    public DbSet<Domain.Entities.Core.Range> Ranges { get; set; }
     public DbSet<Spell> Spells { get; set; }
     public DbSet<Tag> Tags { get; set; }
 	#endregion
@@ -47,14 +43,10 @@ public class PortalQuestDbContext : DbContext
 				c => new Dictionary<string, int>(c)));          // Deep copy for snapshotting
 
 		#region IsDeleted Global Query Filter
-		modelBuilder.Entity<CastingTime>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Class>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<DamageType>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Duration>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Effect>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Domain.Entities.Core.Range>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Spell>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Tag>().HasQueryFilter(x => !x.IsDeleted);
 		#endregion

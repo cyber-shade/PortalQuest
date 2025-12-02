@@ -12,7 +12,7 @@ using PortalQuest.Persistence.Context;
 namespace PortalQuest.Persistence.Migrations
 {
     [DbContext(typeof(PortalQuestDbContext))]
-    [Migration("20251129170728_Core")]
+    [Migration("20251202104535_Core")]
     partial class Core
     {
         /// <inheritdoc />
@@ -24,26 +24,6 @@ namespace PortalQuest.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("PortalQuest.Domain.Entities.Core.CastingTime", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CastingTime");
-                });
 
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Class", b =>
                 {
@@ -108,6 +88,7 @@ namespace PortalQuest.Persistence.Migrations
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.DamageType", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
@@ -123,46 +104,6 @@ namespace PortalQuest.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DamageType");
-                });
-
-            modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Duration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Durations");
-                });
-
-            modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Effect", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Effects");
                 });
 
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.M2M.SpellClass", b =>
@@ -207,26 +148,6 @@ namespace PortalQuest.Persistence.Migrations
                     b.ToTable("SpellTag");
                 });
 
-            modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Range", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ranges");
-                });
-
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Spell", b =>
                 {
                     b.Property<Guid>("Id")
@@ -235,8 +156,9 @@ namespace PortalQuest.Persistence.Migrations
                     b.Property<int?>("AttackType")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("CastingTimeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("CastingTime")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("Concentration")
                         .HasColumnType("boolean");
@@ -248,14 +170,16 @@ namespace PortalQuest.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.Property<Guid?>("DamageTypeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("DamageType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("DurationId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Duration")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -270,8 +194,9 @@ namespace PortalQuest.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("RangeId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Range")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<bool>("Ritual")
                         .HasColumnType("boolean");
@@ -281,15 +206,7 @@ namespace PortalQuest.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CastingTimeId");
-
                     b.HasIndex("ConditionId");
-
-                    b.HasIndex("DamageTypeId");
-
-                    b.HasIndex("DurationId");
-
-                    b.HasIndex("RangeId");
 
                     b.ToTable("Spells");
                 });
@@ -354,41 +271,11 @@ namespace PortalQuest.Persistence.Migrations
 
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Spell", b =>
                 {
-                    b.HasOne("PortalQuest.Domain.Entities.Core.CastingTime", "CastingTime")
-                        .WithMany()
-                        .HasForeignKey("CastingTimeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PortalQuest.Domain.Entities.Core.Condition", "Condition")
                         .WithMany()
                         .HasForeignKey("ConditionId");
 
-                    b.HasOne("PortalQuest.Domain.Entities.Core.DamageType", "DamageType")
-                        .WithMany()
-                        .HasForeignKey("DamageTypeId");
-
-                    b.HasOne("PortalQuest.Domain.Entities.Core.Duration", "Duration")
-                        .WithMany()
-                        .HasForeignKey("DurationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PortalQuest.Domain.Entities.Core.Range", "Range")
-                        .WithMany()
-                        .HasForeignKey("RangeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CastingTime");
-
                     b.Navigation("Condition");
-
-                    b.Navigation("DamageType");
-
-                    b.Navigation("Duration");
-
-                    b.Navigation("Range");
                 });
 
             modelBuilder.Entity("PortalQuest.Domain.Entities.Core.Class", b =>

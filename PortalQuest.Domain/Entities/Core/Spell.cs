@@ -14,22 +14,14 @@ public class Spell : BaseCoreEntity
 	public MagicSchoolEnum MagicSchool { get; set; }
 	public AbilityScoreEnum? Save { get; set; }
 	public AttackTypeEnum? AttackType { get; set; }
+	public string CastingTime { get; set; }
+	public string Range { get; set; }
+	public string Duration { get; set; }
+	public string DamageType { get; set; }
 	#region Relation
-	public Guid CastingTimeId { get; set; }
-	[ForeignKey(nameof(CastingTimeId))]
-	public CastingTime CastingTime { get; set; }
-	public Guid DurationId { get; set; }
-	[ForeignKey(nameof(DurationId))]
-	public Duration Duration { get; set; }
-	public Guid? DamageTypeId { get; set; }
-	[ForeignKey(nameof(DamageTypeId))]
-	public DamageType? DamageType { get; set; }
 	public Guid? ConditionId { get; set; }
 	[ForeignKey(nameof(ConditionId))]
 	public Condition? Condition { get; set; }
-	public Guid RangeId { get; set; }
-	[ForeignKey(nameof(RangeId))]
-	public Range Range { get; set; }
 	#endregion
 	#region M2M Relation
 	public ICollection<SpellClass> SpellClasses { get; set; }
