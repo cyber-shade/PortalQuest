@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using PortalQuest.Application.Interfaces;
+using PortalQuest.Application.Interfaces.Repository;
 using PortalQuest.Domain.Entities.Common;
 using PortalQuest.Persistence.Context;
 

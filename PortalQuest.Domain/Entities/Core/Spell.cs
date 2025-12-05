@@ -18,10 +18,14 @@ public class Spell : BaseCoreEntity
 	public string Range { get; set; }
 	public string Duration { get; set; }
 	public string DamageType { get; set; }
+	public string Components { get; set; }
 	#region Relation
 	public Guid? ConditionId { get; set; }
 	[ForeignKey(nameof(ConditionId))]
 	public Condition? Condition { get; set; }
+	public Guid? SourceId { get; set; }
+	[ForeignKey(nameof(SourceId))]
+	public Source Source { get; set; }	
 	#endregion
 	#region M2M Relation
 	public ICollection<SpellClass> SpellClasses { get; set; }
