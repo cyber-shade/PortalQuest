@@ -23,10 +23,15 @@ public class PortalQuestDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		var entityTypes = modelBuilder.Model.GetEntityTypes()
-	   .Where(t => t.ClrType.IsSubclassOf(typeof(BaseEntity)) || t.ClrType == typeof(BaseEntity));
+			.Where(t => t.ClrType.IsSubclassOf(typeof(BaseEntity)) || t.ClrType == typeof(BaseEntity));
 		foreach (var entityType in entityTypes)
 		{
-			modelBuilder.Entity(entityType.ClrType)
+			var clrType = entityType.ClrType;
+
+			modelBuilder.Entity(clrType)
+				.HasKey(nameof(BaseEntity.Id));
+
+			modelBuilder.Entity(clrType)
 				.Property("Id")
 				.ValueGeneratedNever()
 				.IsRequired();
@@ -47,6 +52,7 @@ public class PortalQuestDbContext : DbContext
 		modelBuilder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<DamageType>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Source>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Spell>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Tag>().HasQueryFilter(x => !x.IsDeleted);
 		#endregion

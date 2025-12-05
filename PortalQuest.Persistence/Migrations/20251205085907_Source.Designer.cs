@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PortalQuest.Persistence.Context;
@@ -11,9 +12,11 @@ using PortalQuest.Persistence.Context;
 namespace PortalQuest.Persistence.Migrations
 {
     [DbContext(typeof(PortalQuestDbContext))]
-    partial class PortalQuestDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251205085907_Source")]
+    partial class Source
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
