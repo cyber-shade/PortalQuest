@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using PortalQuest.Domain.Entities.Common;
-namespace PortalQuest.Application.Interfaces;
+namespace PortalQuest.Application.Interfaces.Repository;
 public interface IGenericRepository<T> where T : BaseEntity
 {
 	Task<bool> Any(Expression<Func<T, bool>> where = null);
