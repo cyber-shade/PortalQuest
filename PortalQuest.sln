@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{755184E9-F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{7C770EFC-3A7F-4CAA-8477-F9F9984A5449}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortalQuest.Console", "PortalQuest.Console\PortalQuest.Console.csproj", "{680AF04A-EF11-49B3-98EC-5C32CDD74746}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{E7D5E054-7400-472A-B2A6-2051FB671847}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7D5E054-7400-472A-B2A6-2051FB671847}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7D5E054-7400-472A-B2A6-2051FB671847}.Release|Any CPU.Build.0 = Release|Any CPU
+		{680AF04A-EF11-49B3-98EC-5C32CDD74746}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{680AF04A-EF11-49B3-98EC-5C32CDD74746}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{680AF04A-EF11-49B3-98EC-5C32CDD74746}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{680AF04A-EF11-49B3-98EC-5C32CDD74746}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{E7D5E054-7400-472A-B2A6-2051FB671847} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{755184E9-F7CA-44D2-BA1E-66FB1D9C38BE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{7C770EFC-3A7F-4CAA-8477-F9F9984A5449} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{680AF04A-EF11-49B3-98EC-5C32CDD74746} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20BF1FD4-A4A2-480E-AC16-D8E765645C04}
