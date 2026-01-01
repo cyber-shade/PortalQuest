@@ -4,5 +4,5 @@ namespace PortalQuest.Domain.Entities.Core;
 public class BaseCoreEntity : BaseEntity
 {
 	public string Name { get; set; }
-	public string? Description { get; set; }
+	public string Content { get; set; }
 }

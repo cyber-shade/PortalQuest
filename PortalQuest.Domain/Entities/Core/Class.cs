@@ -4,7 +4,7 @@ namespace PortalQuest.Domain.Entities.Core;
 public class Class : BaseCoreEntity
 {
 	#region M2M Relation
-	public ICollection<SpellClass> SpellClasses { get; set; }
+	public List<SpellClass> SpellClasses { get; set; }
 	#endregion
 }
 
