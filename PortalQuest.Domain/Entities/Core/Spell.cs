@@ -7,6 +7,7 @@ namespace PortalQuest.Domain.Entities.Core
 	{
 		public int SourcePage { get; set; }
 		public bool SRD { get; set; }
+		public string NameInSRD { get; set; }
 		public int Level { get; set; }
 		public bool Concentration { get; set; }
 		public bool Ritual { get; set; }
@@ -16,7 +17,7 @@ namespace PortalQuest.Domain.Entities.Core
 		public List<AbilityScoreEnum> SavingThrow { get; set; }
 		public List<DamageTypeEnum> DamageType { get; set; }
 		#region Realation
-		public Duration Duration { get; set; }
+		public List<Duration> Duration { get; set; }
 		public Range Range { get; set; }
 		public Source Source { get; set; }
 		public List<Time> CastingTime { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace PortalQuest.Domain.Enums.Core
 {
-	public enum TimeTyprEnum
+	public enum TimeTypeEnum
 	{
 		Reaction,
 		BonusAction,

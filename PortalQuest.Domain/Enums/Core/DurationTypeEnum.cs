@@ -4,6 +4,7 @@
 	{
 		Instant,
 		Timed,
-		Permanent
+		Permanent,
+		Special
 	}
 }

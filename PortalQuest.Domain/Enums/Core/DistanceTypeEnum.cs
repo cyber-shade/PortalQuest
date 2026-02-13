@@ -5,6 +5,6 @@
 		Self,
 		Touch,
 		Feet,
-		Mile
+		Miles
 	}
 }

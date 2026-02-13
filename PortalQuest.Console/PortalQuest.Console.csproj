@@ -18,6 +18,9 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+	  <Content Include="data\*">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PortalQuest.Application\PortalQuest.Application.csproj" />
+    <ProjectReference Include="..\PortalQuest.Infrastructure\PortalQuest.Infrastructure.csproj" />
     <ProjectReference Include="..\PortalQuest.Persistence\PortalQuest.Persistence.csproj" />
   </ItemGroup>
 
