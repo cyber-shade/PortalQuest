@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Entities.Core.M2M;
 using PortalQuest.Domain.Enums.Core;
 
-namespace PortalQuest.Domain.Entities.Core
+namespace PortalQuest.Application.DTOs.Core
 {
-	public class Spell : BaseCoreEntity
+	public class ImportSpellDto
 	{
 		public int SourcePage { get; set; }
 		public bool SRD { get; set; }
@@ -24,11 +25,7 @@ namespace PortalQuest.Domain.Entities.Core
 		public bool? MaterialConsume { get; set; }
 		#region Realation
 		public List<Duration> Duration { get; set; }
-		public Guid RangeId { get; set; }
-		[ForeignKey(nameof(RangeId))]
 		public Range Range { get; set; }
-		public Guid SourceId { get; set; }
-		[ForeignKey(nameof(SourceId))]
 		public Source Source { get; set; }
 		public List<Time> CastingTime { get; set; }
 		public List<SpellClass> SpellClasses { get; set; }

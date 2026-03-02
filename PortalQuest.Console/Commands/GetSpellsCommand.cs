@@ -85,26 +85,21 @@ namespace PortalQuest.Console.Commands
 				"N" => MagicSchoolEnum.Necromancy,
 				"T" => MagicSchoolEnum.Transmutation,
 			};
-			spell.Components = new Component()
-			{
-				Somatic = json.GetValue<bool>("components", "s"),
-				Verbal = json.GetValue<bool>("components", "v"),
-			};
+			spell.Somatic = json.GetValue<bool>("components", "s");
+			spell.Verbal = json.GetValue<bool>("components", "v");
 			var materialObject = json.GetValue("components", "m");
 			if (materialObject != null)
 			{
-				var material = new Material();
 				if (materialObject is string m)
-					material.Description = m;
+					spell.MaterialDescription = m;
 				else
 				{
-					material.Cost = json.GetValue<int>("components", "m", "cost");
+					spell.MaterialCost = json.GetValue<int>("components", "m", "cost");
 					var consume = json.GetValue<string>("components", "m", "consume");
 					if (bool.TryParse(consume, out bool isConsume))
-						material.Consume = isConsume;
-					material.Description = json.GetValue<string>("components", "m", "text");
+						spell.MaterialConsume = isConsume;
+					spell.MaterialDescription = json.GetValue<string>("components", "m", "text");
 				}
-				spell.Components.Material = material;
 			}
 			spell.SavingThrow = new List<AbilityScoreEnum> { };
 			var savingThrows = json.GetValue<string[]>("savingThrow");

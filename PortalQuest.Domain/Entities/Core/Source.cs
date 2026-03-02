@@ -2,7 +2,7 @@
 public class Source : BaseCoreEntity
 {
 
-	#region Business Logic
-
+	#region Relation
+	public List<Spell> spells { get; set; }
 	#endregion
 }

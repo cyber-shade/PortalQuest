@@ -8,5 +8,6 @@ namespace PortalQuest.Domain.Entities.Core
 		public int Amount { get; set; }
 		public TimeTypeEnum Type {get; set;}
 		public string Condition { get; set;}
+		public List<Spell> Spells { get; set;}
 	}
 }

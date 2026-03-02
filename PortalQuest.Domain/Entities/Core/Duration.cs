@@ -10,5 +10,6 @@ namespace PortalQuest.Domain.Entities.Core
 		public List<string> Ends { get; set; } // if type is Permanent
 										 //dispel
 										 //trigger
+		public List<Spell> Spells { get; set; }
 	}
 }
