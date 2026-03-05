@@ -19,6 +19,7 @@ public class PortalQuestDbContext : DbContext
     public DbSet<Source> Sources { get; set; }
     public DbSet<Spell> Spells { get; set; }
 	public DbSet<Time> Times { get; set; }
+	public DbSet<Log> Logs { get; set; }
 	#endregion
 	#region OnModelCreating
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
