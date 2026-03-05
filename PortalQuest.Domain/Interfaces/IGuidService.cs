@@ -2,4 +2,5 @@
 public interface IGuidService
 {
 	Guid Generate();
+	bool IsEmpty(Guid id);
 }

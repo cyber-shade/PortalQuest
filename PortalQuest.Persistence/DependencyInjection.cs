@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PortalQuest.Application.Interfaces.Repository;
+using PortalQuest.Application.Interfaces.Repository.Common;
 using PortalQuest.Application.Interfaces.Repository.Core;
 using PortalQuest.Persistence.Context;
-using PortalQuest.Persistence.Repository;
+using PortalQuest.Persistence.Repository.Common;
 using PortalQuest.Persistence.Repository.Core;
 
 namespace PortalQuest.Persistence;
@@ -18,6 +18,7 @@ public static class DependencyInjection
 		services.AddScoped<IClassRepository, ClassRepository>();
 		services.AddScoped<ISourceRepository, SourceRepository>();
 		services.AddScoped<ISpellRepository, SpellRepository>();
+		services.AddScoped<ILogRepository, LogRepository>();
 		#endregion
 		return services;
 	}

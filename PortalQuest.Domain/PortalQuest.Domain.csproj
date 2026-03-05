@@ -10,8 +10,4 @@
     <Folder Include="Entities\Blog\" />
     <Folder Include="Entities\Community\" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-  </ItemGroup>
 </Project>

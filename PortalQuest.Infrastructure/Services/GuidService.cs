@@ -4,4 +4,5 @@ namespace PortalQuest.Infrastructure.Services;
 public class GuidService : IGuidService
 {
 	public Guid Generate() => Guid.NewGuid();
+	public bool IsEmpty(Guid id) =>  id == Guid.Empty;
 } 

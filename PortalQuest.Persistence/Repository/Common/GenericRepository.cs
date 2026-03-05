@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using PortalQuest.Application.Interfaces.Repository;
+using PortalQuest.Application.Interfaces.Repository.Common;
 using PortalQuest.Domain.Entities.Common;
 using PortalQuest.Persistence.Context;
 
-namespace PortalQuest.Persistence.Repository;
+namespace PortalQuest.Persistence.Repository.Common;
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
 	private readonly PortalQuestDbContext _dbContext;
@@ -18,7 +18,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 		await _dbContext.SaveChangesAsync();
 	}
 
-	public async Task<bool> Any(Expression<Func<T, bool>> where = null)
+	public async Task<bool> Any(Expression<Func<T, bool>> where)
 	{
 		return await _dbContext.Set<T>().AnyAsync(where);
 	}
