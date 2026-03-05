@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using PortalQuest.Domain.Entities.Common;
 using PortalQuest.Domain.Entities.Core;
 
@@ -14,11 +13,8 @@ public class PortalQuestDbContext : DbContext
     }
 	#region Core
     public DbSet<Class> Classes { get; set; }
-    public DbSet<Component> Components { get; set; }
     public DbSet<Condition> Conditions { get; set; }
-    public DbSet<DamageType> DamageTypes { get; set; }
     public DbSet<Duration> Durations { get; set; }
-    public DbSet<Material> Materials { get; set; }
     public DbSet<Domain.Entities.Core.Range> Ranges { get; set; }
     public DbSet<Source> Sources { get; set; }
     public DbSet<Spell> Spells { get; set; }
@@ -47,11 +43,8 @@ public class PortalQuestDbContext : DbContext
 
 		#region IsDeleted Global Query Filter
 		modelBuilder.Entity<Class>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<DamageType>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Duration>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Material>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Domain.Entities.Core.Range>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Source>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Spell>().HasQueryFilter(x => !x.IsDeleted);

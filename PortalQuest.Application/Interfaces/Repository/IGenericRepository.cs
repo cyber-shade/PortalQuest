@@ -4,10 +4,16 @@ namespace PortalQuest.Application.Interfaces.Repository;
 public interface IGenericRepository<T> where T : BaseEntity
 {
 	Task<bool> Any(Expression<Func<T, bool>> where = null);
-	Task<List<T>> GetAll(Expression<Func<T, bool>> where = null, int skip = 0, int take = int.MaxValue);
+	Task<(IReadOnlyList<T> items, int count)> GetAll(Expression<Func<T, bool>> where = null,
+			Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+			Func<IQueryable<T>, IQueryable<T>>? include = null,
+			int skip = 0, int take = int.MaxValue);
 	Task<T?> Get(Guid id);
-	Task<T?> FirstOrDefault(Expression<Func<T, bool>> where = null);
+	Task<T?> FirstOrDefault(Expression<Func<T, bool>> where,
+		Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+		Func<IQueryable<T>, IQueryable<T>>? include = null);
 	Task Add(T entity);
 	Task Update(T entity);
 	Task SoftDelete(Guid id);
+	Task SoftDelete(T entity);
 }

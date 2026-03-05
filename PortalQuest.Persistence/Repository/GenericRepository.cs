@@ -23,9 +23,21 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 		return await _dbContext.Set<T>().AnyAsync(where);
 	}
 
-	public async Task<T?> FirstOrDefault(Expression<Func<T, bool>> where)
+	public async Task<T?> FirstOrDefault(Expression<Func<T, bool>> where, 
+		Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+		Func<IQueryable<T>, IQueryable<T>>? include = null)
 	{
-		return await _dbContext.Set<T>().FirstOrDefaultAsync(where);
+		IQueryable<T> query = _dbContext.Set<T>();
+		if(include != null)
+		{
+			query = include(query);
+
+			// Optional: Split query if includes are too heavy
+			query = query.AsSplitQuery();
+		}
+		if (orderBy != null)
+			query = orderBy(query);
+		return await query.FirstOrDefaultAsync(where);
 	}
 
 	public async Task<T?> Get(Guid id)
@@ -33,10 +45,30 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 		return await _dbContext.Set<T>().FindAsync(id);
 	}
 
-	public async Task<List<T>> GetAll(Expression<Func<T, bool>> where = null, int skip = 0, int take = int.MaxValue)
+	public async Task<(IReadOnlyList<T> items, int count)> GetAll(Expression<Func<T, bool>> where = null,
+			Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+			Func<IQueryable<T>, IQueryable<T>>? include = null,
+			int skip = 0, int take = int.MaxValue)
 	{
-		return await _dbContext.Set<T>().Where(where != null ? where : t => true)
-			.Skip(skip).Take(take).ToListAsync();
+		IQueryable<T> query = _dbContext.Set<T>();
+		if (include != null)
+		{
+			query = include(query);
+
+			// Optional: Split query if includes are too heavy
+			query = query.AsSplitQuery();
+		}
+		if (where != null)
+			query = query.Where(where);
+
+		var totalCount = await query.CountAsync();
+
+		if (orderBy != null)
+			query = orderBy(query);
+
+		var items = await query.Skip(skip).Take(take).ToListAsync();
+
+		return (items, totalCount);
 	}
 
 	public async Task SoftDelete(Guid id)

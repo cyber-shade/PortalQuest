@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace PortalQuest.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Core : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,20 +28,6 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Classes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Classes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Conditions",
                 columns: table => new
                 {
@@ -52,35 +39,6 @@ namespace PortalQuest.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Conditions", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DamageTypes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DamageTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Materials",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Cost = table.Column<int>(type: "integer", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Consume = table.Column<bool>(type: "boolean", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Materials", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,6 +61,7 @@ namespace PortalQuest.Persistence.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ShortName = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false)
@@ -113,38 +72,39 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Components",
+                name: "Times",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Verbal = table.Column<bool>(type: "boolean", nullable: false),
-                    Somatic = table.Column<bool>(type: "boolean", nullable: false),
-                    MaterialId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Amount = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Condition = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Components", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Components_Materials_MaterialId",
-                        column: x => x.MaterialId,
-                        principalTable: "Materials",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_Times", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Durations",
+                name: "Classes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    TimeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Ends = table.Column<List<string>>(type: "text[]", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    SourceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Durations", x => x.Id);
+                    table.PrimaryKey("PK_Classes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Classes_Sources_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Sources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -154,15 +114,20 @@ namespace PortalQuest.Persistence.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     SourcePage = table.Column<int>(type: "integer", nullable: false),
                     SRD = table.Column<bool>(type: "boolean", nullable: false),
+                    NameInSRD = table.Column<string>(type: "text", nullable: false),
                     Level = table.Column<int>(type: "integer", nullable: false),
                     Concentration = table.Column<bool>(type: "boolean", nullable: false),
                     Ritual = table.Column<bool>(type: "boolean", nullable: false),
                     School = table.Column<int>(type: "integer", nullable: false),
-                    ComponentsId = table.Column<Guid>(type: "uuid", nullable: false),
                     AbilityCheck = table.Column<int[]>(type: "integer[]", nullable: false),
                     SavingThrow = table.Column<int[]>(type: "integer[]", nullable: false),
                     DamageType = table.Column<int[]>(type: "integer[]", nullable: false),
-                    DurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Verbal = table.Column<bool>(type: "boolean", nullable: false),
+                    Somatic = table.Column<bool>(type: "boolean", nullable: false),
+                    Material = table.Column<bool>(type: "boolean", nullable: false),
+                    MaterialCost = table.Column<int>(type: "integer", nullable: true),
+                    MaterialDescription = table.Column<string>(type: "text", nullable: true),
+                    MaterialConsume = table.Column<bool>(type: "boolean", nullable: true),
                     RangeId = table.Column<Guid>(type: "uuid", nullable: false),
                     SourceId = table.Column<Guid>(type: "uuid", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
@@ -172,18 +137,6 @@ namespace PortalQuest.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Spells", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Spells_Components_ComponentsId",
-                        column: x => x.ComponentsId,
-                        principalTable: "Components",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Spells_Durations_DurationId",
-                        column: x => x.DurationId,
-                        principalTable: "Durations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Spells_Ranges_RangeId",
                         column: x => x.RangeId,
@@ -199,12 +152,77 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SpellClass",
+                name: "Durations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    TimeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Ends = table.Column<List<string>>(type: "text[]", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Durations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Durations_Times_TimeId",
+                        column: x => x.TimeId,
+                        principalTable: "Times",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClassFeature",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassFeature", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClassFeature_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Classes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubClass",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubClass", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SubClass_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Classes",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpellClass",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsVariant = table.Column<bool>(type: "boolean", nullable: false),
                     SpellId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ClassId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ClassId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SourceId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -216,6 +234,11 @@ namespace PortalQuest.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_SpellClass_Sources_SourceId",
+                        column: x => x.SourceId,
+                        principalTable: "Sources",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_SpellClass_Spells_SpellId",
                         column: x => x.SpellId,
                         principalTable: "Spells",
@@ -224,30 +247,67 @@ namespace PortalQuest.Persistence.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Times",
+                name: "SpellTime",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<int>(type: "integer", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Condition = table.Column<string>(type: "text", nullable: false),
-                    SpellId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    CastingTimeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SpellsId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Times", x => x.Id);
+                    table.PrimaryKey("PK_SpellTime", x => new { x.CastingTimeId, x.SpellsId });
                     table.ForeignKey(
-                        name: "FK_Times_Spells_SpellId",
-                        column: x => x.SpellId,
+                        name: "FK_SpellTime_Spells_SpellsId",
+                        column: x => x.SpellsId,
                         principalTable: "Spells",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SpellTime_Times_CastingTimeId",
+                        column: x => x.CastingTimeId,
+                        principalTable: "Times",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DurationSpell",
+                columns: table => new
+                {
+                    DurationId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SpellsId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DurationSpell", x => new { x.DurationId, x.SpellsId });
+                    table.ForeignKey(
+                        name: "FK_DurationSpell_Durations_DurationId",
+                        column: x => x.DurationId,
+                        principalTable: "Durations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DurationSpell_Spells_SpellsId",
+                        column: x => x.SpellsId,
+                        principalTable: "Spells",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Components_MaterialId",
-                table: "Components",
-                column: "MaterialId");
+                name: "IX_ClassFeature_ClassId",
+                table: "ClassFeature",
+                column: "ClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Classes_SourceId",
+                table: "Classes",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DurationSpell_SpellsId",
+                table: "DurationSpell",
+                column: "SpellsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Durations_TimeId",
@@ -260,19 +320,19 @@ namespace PortalQuest.Persistence.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SpellClass_SourceId",
+                table: "SpellClass",
+                column: "SourceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SpellClass_SpellId",
                 table: "SpellClass",
                 column: "SpellId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Spells_ComponentsId",
-                table: "Spells",
-                column: "ComponentsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Spells_DurationId",
-                table: "Spells",
-                column: "DurationId");
+                name: "IX_SpellTime_SpellsId",
+                table: "SpellTime",
+                column: "SpellsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Spells_RangeId",
@@ -285,59 +345,46 @@ namespace PortalQuest.Persistence.Migrations
                 column: "SourceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Times_SpellId",
-                table: "Times",
-                column: "SpellId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Durations_Times_TimeId",
-                table: "Durations",
-                column: "TimeId",
-                principalTable: "Times",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                name: "IX_SubClass_ClassId",
+                table: "SubClass",
+                column: "ClassId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Components_Materials_MaterialId",
-                table: "Components");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Durations_Times_TimeId",
-                table: "Durations");
-
             migrationBuilder.DropTable(
                 name: "BaseCoreEntity");
+
+            migrationBuilder.DropTable(
+                name: "ClassFeature");
 
             migrationBuilder.DropTable(
                 name: "Conditions");
 
             migrationBuilder.DropTable(
-                name: "DamageTypes");
+                name: "DurationSpell");
 
             migrationBuilder.DropTable(
                 name: "SpellClass");
 
             migrationBuilder.DropTable(
-                name: "Classes");
+                name: "SpellTime");
 
             migrationBuilder.DropTable(
-                name: "Materials");
+                name: "SubClass");
 
             migrationBuilder.DropTable(
-                name: "Times");
+                name: "Durations");
 
             migrationBuilder.DropTable(
                 name: "Spells");
 
             migrationBuilder.DropTable(
-                name: "Components");
+                name: "Classes");
 
             migrationBuilder.DropTable(
-                name: "Durations");
+                name: "Times");
 
             migrationBuilder.DropTable(
                 name: "Ranges");

@@ -17,4 +17,9 @@
     <ProjectReference Include="..\PortalQuest.Domain\PortalQuest.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\Core\" />
+    <Folder Include="Features\Core\Init\Query\" />
+  </ItemGroup>
+
 </Project>

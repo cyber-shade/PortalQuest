@@ -30,8 +30,8 @@ namespace PortalQuest.Domain.Entities.Core
 		public Guid SourceId { get; set; }
 		[ForeignKey(nameof(SourceId))]
 		public Source Source { get; set; }
-		public List<Time> CastingTime { get; set; }
-		public List<SpellClass> SpellClasses { get; set; }
+		public List<Time> CastingTime { get; set; } // O2M
+		public List<SpellClass> SpellClasses { get; set; } // M2M
 		#endregion
 	}
 }
