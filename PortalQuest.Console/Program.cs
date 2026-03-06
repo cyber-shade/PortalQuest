@@ -14,6 +14,7 @@ builder.ConfigureServices((context, services) => {
 	services.AddPersistenceServices(context.Configuration);
 	services.AddTransient<IConsoleCommand, GetSpellsCommand>();
 	services.AddTransient<IConsoleCommand, GetBooksCommand>();
+	services.AddTransient<IConsoleCommand, GetClassesCommand>();
 	services.AddSingleton<CommandRunner>();
 });
 var app = builder.Build();

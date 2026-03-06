@@ -6,5 +6,6 @@
 		public const string DataError = "خطای داده رخ داده است.";
 
 		public const string SourceNotFound = "منبع یافت نشد.";
+		public const string ClassNotFound = "کلاس یافت نشد.";
 	}
 }

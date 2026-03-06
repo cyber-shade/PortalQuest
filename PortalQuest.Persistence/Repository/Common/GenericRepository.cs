@@ -45,7 +45,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 		return await _dbContext.Set<T>().FindAsync(id);
 	}
 
-	public async Task<(IReadOnlyList<T> items, int count)> GetAll(Expression<Func<T, bool>> where = null,
+	public async Task<(List<T> items, int count)> GetAll(Expression<Func<T, bool>> where = null,
 			Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
 			Func<IQueryable<T>, IQueryable<T>>? include = null,
 			int skip = 0, int take = int.MaxValue)
