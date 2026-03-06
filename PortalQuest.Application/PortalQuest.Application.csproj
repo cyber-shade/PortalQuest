@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Core\Source\Query\" />
+    <Folder Include="Features\Core\Book\Query\" />
   </ItemGroup>
 
 </Project>
