@@ -13,6 +13,7 @@ builder.ConfigureServices((context, services) => {
 	services.AddInfrastructureServices();
 	services.AddPersistenceServices(context.Configuration);
 	services.AddTransient<IConsoleCommand, GetSpellsCommand>();
+	services.AddTransient<IConsoleCommand, GetBooksCommand>();
 	services.AddSingleton<CommandRunner>();
 });
 var app = builder.Build();

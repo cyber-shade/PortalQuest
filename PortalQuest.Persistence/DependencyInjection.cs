@@ -16,7 +16,7 @@ public static class DependencyInjection
 		#region IOC EFCore
 		services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 		services.AddScoped<IClassRepository, ClassRepository>();
-		services.AddScoped<ISourceRepository, SourceRepository>();
+		services.AddScoped<IBookRepository, BookRepository>();
 		services.AddScoped<ISpellRepository, SpellRepository>();
 		services.AddScoped<ILogRepository, LogRepository>();
 		#endregion

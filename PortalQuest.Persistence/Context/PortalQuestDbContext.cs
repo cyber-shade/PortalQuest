@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PortalQuest.Domain.Entities.Common;
 using PortalQuest.Domain.Entities.Core;
 
@@ -16,7 +15,7 @@ public class PortalQuestDbContext : DbContext
     public DbSet<Condition> Conditions { get; set; }
     public DbSet<Duration> Durations { get; set; }
     public DbSet<Domain.Entities.Core.Range> Ranges { get; set; }
-    public DbSet<Source> Sources { get; set; }
+    public DbSet<Book> Books { get; set; }
     public DbSet<Spell> Spells { get; set; }
 	public DbSet<Time> Times { get; set; }
 	public DbSet<Log> Logs { get; set; }
@@ -47,10 +46,38 @@ public class PortalQuestDbContext : DbContext
 		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Duration>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Domain.Entities.Core.Range>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Source>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Book>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Spell>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Time>().HasQueryFilter(x => !x.IsDeleted);
 		#endregion
+	}
+	#endregion
+	#region SaveChanges
+	// specify DateTimeKind UTC
+	public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+	{
+		foreach (var entry in ChangeTracker.Entries()
+			.Where(e => e.State == EntityState.Added || e.State == EntityState.Modified))
+		{
+			var dateTimeProperties = entry.Entity.GetType().GetProperties()
+				.Where(p => p.PropertyType == typeof(DateTime) ||
+							p.PropertyType == typeof(DateTime?));
+
+			foreach (var property in dateTimeProperties)
+			{
+				var currentValue = (DateTime?)property.GetValue(entry.Entity);
+
+				if (currentValue.HasValue)
+				{
+					if (currentValue.Value.Kind == DateTimeKind.Unspecified ||
+						currentValue.Value.Kind == DateTimeKind.Local)
+					{
+						property.SetValue(entry.Entity, currentValue.Value.ToUniversalTime());
+					}
+				}
+			}
+		}
+		return base.SaveChangesAsync(cancellationToken);
 	}
 	#endregion
 }
