@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="Features\Core\Class\Query\" />
+    <Folder Include="Features\Core\Effect\Query\" />
   </ItemGroup>
 
 </Project>

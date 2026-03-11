@@ -7,5 +7,6 @@
 
 		public const string SourceNotFound = "منبع یافت نشد.";
 		public const string ClassNotFound = "کلاس یافت نشد.";
+		public const string EffectNotFound = "تاثیر یافت نشد";
 	}
 }

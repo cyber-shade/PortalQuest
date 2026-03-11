@@ -9,5 +9,6 @@ public class MappingProfile : Profile
 	{
 		CreateMap<BookDto, Book>().ReverseMap();
 		CreateMap<ClassDto, Class>().ReverseMap();
+		CreateMap<EffectDto, Effect>().ReverseMap();
 	}
 }

@@ -12,7 +12,7 @@ public class PortalQuestDbContext : DbContext
     }
 	#region Core
     public DbSet<Class> Classes { get; set; }
-    public DbSet<Condition> Conditions { get; set; }
+    public DbSet<Effect> Effects { get; set; }
     public DbSet<Duration> Durations { get; set; }
     public DbSet<Domain.Entities.Core.Range> Ranges { get; set; }
     public DbSet<Book> Books { get; set; }
@@ -43,7 +43,7 @@ public class PortalQuestDbContext : DbContext
 
 		#region IsDeleted Global Query Filter
 		modelBuilder.Entity<Class>().HasQueryFilter(x => !x.IsDeleted);
-		modelBuilder.Entity<Condition>().HasQueryFilter(x => !x.IsDeleted);
+		modelBuilder.Entity<Effect>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Duration>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Domain.Entities.Core.Range>().HasQueryFilter(x => !x.IsDeleted);
 		modelBuilder.Entity<Book>().HasQueryFilter(x => !x.IsDeleted);
