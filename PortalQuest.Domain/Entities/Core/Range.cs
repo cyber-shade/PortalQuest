@@ -8,6 +8,8 @@ namespace PortalQuest.Domain.Entities.Core
 		public RangeTypeEnum Type { get; set; }
 		public DistanceTypeEnum DistanceType { get; set; }
 		public int Amount { get; set; }
+		#region Relations
 		public List<Spell> Spells { get; set; }
+		#endregion
 	}
 }

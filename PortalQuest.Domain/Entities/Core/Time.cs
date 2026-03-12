@@ -8,6 +8,9 @@ namespace PortalQuest.Domain.Entities.Core
 		public int Amount { get; set; }
 		public TimeTypeEnum Type {get; set;}
 		public string Condition { get; set;}
-		public List<Spell> Spells { get; set;}
+		#region Relations
+		public List<Spell>? Spells { get; set;} //M2M
+		public List<Duration>? Durations { get; set;}
+		#endregion
 	}
 }

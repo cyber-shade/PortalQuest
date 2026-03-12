@@ -9,4 +9,7 @@ public class Effect : BaseCoreEntity
 	public int SourcePage { get; set; }
 	public bool SRD { get; set; }
 	public bool BasicRules { get; set; }
+	#region Relations
+	public List<Spell> Spells { get; set; } // M2M
+	#endregion
 }

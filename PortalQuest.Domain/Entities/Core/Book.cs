@@ -5,6 +5,6 @@ public class Book : BaseCoreEntity
 	public DateTime PublishedDateTime { get; set; }
 	public string Author { get; set; }
 	#region Relation
-	public List<Spell> spells { get; set; }
+	public List<Spell> Spells { get; set; }
 	#endregion
 }

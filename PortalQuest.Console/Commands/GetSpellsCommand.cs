@@ -1,79 +1,102 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.VisualBasic;
+﻿using MediatR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PortalQuest.Application.DTOs.Core;
+using PortalQuest.Application.Features.Core.Book.Query;
+using PortalQuest.Application.Features.Core.Class.Query;
+using PortalQuest.Application.Features.Core.Duration.Command;
+using PortalQuest.Application.Features.Core.Duration.Query;
+using PortalQuest.Application.Features.Core.Range.Command;
+using PortalQuest.Application.Features.Core.Range.Query;
+using PortalQuest.Application.Features.Core.Spell.Command;
+using PortalQuest.Application.Features.Core.Time.Command;
+using PortalQuest.Application.Features.Core.Time.Query;
 using PortalQuest.Console.Constants;
+using PortalQuest.Console.ViewModels.Spell;
 using PortalQuest.Domain.Contents;
-using PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Enums.Core;
+using PortalQuest.Console.Tools;
+using PortalQuest.Application.Features.Core.Effect.Query;
 
 namespace PortalQuest.Console.Commands
 {
-	public class GetSpellsCommand : IConsoleCommand
+	public class GetSpellsCommand(
+		IMediator mediator
+	) : IConsoleCommand
 	{
 		public string Name => "get-spells";
-		public List<Source> Sources { get; set; }
+		private List<BookDto> Books { get; set; }
+		private List<ClassDto> Classes { get; set; }
+		private List<EffectDto> Conditions { get; set; }
+		private List<RangeDto> Ranges { get; set; }
+		private List<TimeDto> Times { get; set; }
+		private List<DurationDto> Durations { get; set; }
+		private Dictionary<string, Dictionary<string, SpellClassesVM>> SpellClasses { get; set; }
 
 		public async Task ExecuteAsync()
 		{
+			Books = (await mediator.Send(new GetBooksListRequest())).Result ?? new List<BookDto>();
+			Classes = (await mediator.Send(new GetClassesListRequst())).Result ?? new List<ClassDto>();
+			Ranges = (await mediator.Send(new GetRangesListRequest())).Result ?? new List<RangeDto>();
+			Times = (await mediator.Send(new GetTimesListRequest())).Result ?? new List<TimeDto>();
+			Durations = (await mediator.Send(new GetDurationsListRequest())).Result ?? new List<DurationDto>();
+			Conditions = (await mediator.Send(new GetEffectsListRequest()
+			{
+				Type = EffectTypesEnum.Condition
+			})).Result ?? new List<EffectDto>();
+
 			var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data", "spells");
 			if (!Directory.Exists(dataPath))
 			{
 				System.Console.WriteLine(ConsoleMessages.DataNotFound);
 				return;
 			}
+			string sourcesPath = Path.Combine(dataPath, "sources.json");
+			string sourcesJson = await File.ReadAllTextAsync(sourcesPath);
+			var sources = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, SpellClassesVM>>>(sourcesJson);
+			if (sources == null)
+				return;
+			SpellClasses = sources;
 
 			string indexPath = Path.Combine(dataPath, "index.json");
 			string indexJson = await File.ReadAllTextAsync(indexPath);
 			var index = JsonConvert.DeserializeObject<Dictionary<string, string>>(indexJson);
 			if (index == null)
-			{
 				return;
-			}
-			Sources = new List<Source>();
-			var spells = new List<Spell>();
-			foreach((var source, var spellPath) in index)
-			{
-				Sources.Add(new Source()
-				{
-					Name = source
-				});
-				var processedSpells = await GetSpells(Path.Combine(dataPath, spellPath));
-				if (processedSpells != null)
-				{
-					spells.AddRange(processedSpells);
-				}
-			}
+
+			foreach ((var source, var spellPath) in index)
+				await GetSpells(Path.Combine(dataPath, spellPath));
 		}
-		public async Task<List<Spell>> GetSpells(string path)
+		private async Task GetSpells(string path)
 		{
-			string json = await File.ReadAllTextAsync(path);
-			var spells = JsonConvert.DeserializeObject<Container>(json)?.Spell;
-			if (spells == null) {
-				return null;
-			}
-			var processedSpells = new List<Spell>();
-			foreach(var spell in spells)
-			{
-				processedSpells.Add(await ProcessSpell(spell));
-			}
-			return processedSpells;
+			string json = await File.ReadAllTextAsync(path); ;
+			var spells = JsonConvert.DeserializeObject<SpellContainerVM>(json)?.Spell;
+			if (spells == null)
+				return;
+
+			foreach (var spell in spells)
+				await SaveSpell(spell);
 		}
-		public async Task<Spell> ProcessSpell(JToken json)
+		private async Task SaveSpell(JToken json)
 		{
-			var spell = new Spell();
+			var spell = new SpellDto();
 			spell.Name = json.GetValue<string>("name") ?? "";
 			var sourceName = json.GetValue<string>("source");
-			spell.Source = Sources.FirstOrDefault(x => x.Name == sourceName);
+			var source = Books.FirstOrDefault(x => x.ShortName == sourceName);
+			if (source == null)
+				return;
+			spell.SourceId = source.Id;
 			spell.SourcePage = json.GetValue<int>("page");
-			var srd = json.GetValue<string>("srd");
-			if(srd  != null)
+			spell.NameInSRD = string.Empty;
+			var srd = json.GetValue<string>("srd") ?? json.GetValue<string>("srd52");
+			if (srd != null)
 				if (bool.TryParse(srd, out bool isSrd))
 					spell.SRD = isSrd;
 				else
 					spell.NameInSRD = srd;
+			spell.BasicRules = (json.GetValue<bool?>("basicRules") ?? json.GetValue<bool?>("basicRules2024")) ?? false;
 			spell.Level = json.GetValue<int>("level");
-			spell.Ritual = json.GetValue<bool>("meta","ritual");
+			spell.Ritual = json.GetValue<bool>("meta", "ritual");
 			spell.School = json.GetValue<string>("school") switch
 			{
 				"A" => MagicSchoolEnum.Abjuration,
@@ -121,14 +144,27 @@ namespace PortalQuest.Console.Commands
 				foreach (var damageType in damageTypes)
 					if (Enum.TryParse<DamageTypeEnum>(damageType, ignoreCase: true, out var parsed))
 						spell.DamageType.Add(parsed);
-			
+
+			await GetDurations(spell, json);
+			await GetTimes(spell, json);
+			await GetRange(spell, json);
+			await GetSpellClasses(spell);
+			await GetConditions(spell, json);
+			GetContent(spell, json);
+			await mediator.Send(new UpsertSpellRequest()
+			{
+				Spell = spell
+			});
+		}
+		private async Task GetDurations(SpellDto spell, JToken json)
+		{
+			spell.DurationIds = new List<Guid>();
 			var durationObjects = json.GetValue<object[]>("duration");
 			if (durationObjects != null)
 			{
-				spell.Duration = new List<Duration>();
-				for(int i =0; i<durationObjects.Length; i++)
+				for (int i = 0; i < durationObjects.Length; i++)
 				{
-					var duration = new Duration();
+					var duration = new DurationDto();
 					if (Enum.TryParse<DurationTypeEnum>(json.GetValue<string>("duration", i.ToString(), "type"), ignoreCase: true, out var parsed))
 						duration.Type = parsed;
 					else
@@ -137,55 +173,93 @@ namespace PortalQuest.Console.Commands
 					{
 						case DurationTypeEnum.Timed:
 							spell.Concentration = json.GetValue<bool>("duration", i.ToString(), "concentration");
-							var time = new Time();
+							var time = new TimeDto();
 							if (Enum.TryParse<TimeTypeEnum>(json.GetValue<string>("duration", i.ToString(), "duration", "type"), ignoreCase: true, out var timeParsed))
 								time.Type = timeParsed;
 							time.Amount = json.GetValue<int>("duration", i.ToString(), "duration", "amount");
-							duration.Time = time;
+							time.Condition = json.GetValue<string>("duration", i.ToString(), "duration", "condition") ?? string.Empty;
+							duration.TimeId = await SaveTime(time);
 							break;
 						case DurationTypeEnum.Permanent:
 							duration.Ends = json.GetValue<List<string>>("duration", i.ToString(), "ends") ?? new List<string>();
 							break;
 					}
-					spell.Duration.Add(duration);
+					spell.DurationIds.Add(await SaveDuration(duration));
 				}
 			}
-			var rangeObject = json.GetValue<object>("range");
-			if(rangeObject != null)
+		}
+		private async Task GetTimes(SpellDto spell, JToken json)
+		{
+			spell.CastingTimeIds = new List<Guid>();
+			var timeObjects = json.GetValue<object[]>("time");
+			if (timeObjects != null)
 			{
-				var range = new Domain.Entities.Core.Range();
+				for (int i = 0; i < timeObjects.Length; i++)
+				{
+					var time = new TimeDto();
+					if (Enum.TryParse<TimeTypeEnum>(json.GetValue<string>("time", i.ToString(), "unit"), ignoreCase: true, out var parsed))
+						time.Type = parsed;
+					time.Amount = json.GetValue<int>("time", i.ToString(), "number");
+					time.Condition = json.GetValue<string>("time", i.ToString(), "condition") ?? string.Empty;
+					spell.CastingTimeIds.Add(await SaveTime(time));
+				}
+			}
+		}
+		private async Task GetRange(SpellDto spell, JToken json)
+		{
+			var rangeObject = json.GetValue<object>("range");
+			if (rangeObject != null)
+			{
+				var range = new RangeDto();
 				if (Enum.TryParse<RangeTypeEnum>(json.GetValue<string>("range", "type"), ignoreCase: true, out var parsed))
 					range.Type = parsed;
 				if (range.Type == RangeTypeEnum.Point || range.Type == RangeTypeEnum.Cone || range.Type == RangeTypeEnum.Radius || range.Type == RangeTypeEnum.Line)
 				{
 					if (Enum.TryParse<DistanceTypeEnum>(json.GetValue<string>("range", "distance", "type"), ignoreCase: true, out var distanceTypeParsed))
 						range.DistanceType = distanceTypeParsed;
-					if(range.DistanceType == DistanceTypeEnum.Feet || range.DistanceType == DistanceTypeEnum.Miles)
+					if (range.DistanceType == DistanceTypeEnum.Feet || range.DistanceType == DistanceTypeEnum.Miles)
 						range.Amount = json.GetValue<int>("range", "distance", "amount");
 				}
-				spell.Range = range;
+				spell.RangeId = await SaveRange(range);
 			}
-			var timeObjects = json.GetValue<object[]>("time");
-			if (timeObjects != null)
+		}
+		private async Task GetSpellClasses(SpellDto spell)
+		{
+			var spellSource = Books.FirstOrDefault(x=> x.Id == spell.SourceId);
+			if(SpellClasses.TryGetValue(spellSource.ShortName, out var spells))
 			{
-				spell.CastingTime = new List<Time>();
-				for (int i = 0; i < timeObjects.Length ; i++)
+				if (spells.TryGetValue(spell.Name, out var spellClasses))
 				{
-					var time = new Time();
-					if (Enum.TryParse<TimeTypeEnum>(json.GetValue<string>("time", i.ToString(), "unit"), ignoreCase: true, out var parsed))
-						time.Type = parsed;
-					time.Amount = json.GetValue<int>("time", i.ToString(), "amount");
-					spell.CastingTime.Add(time);
+					foreach (var spellClass in spellClasses.Class.Concat(spellClasses.ClassVariant))
+					{
+						var classSource = Books.FirstOrDefault(x=> x.ShortName == spellClass.source);
+						var clazz = Classes.FirstOrDefault(x=> x.Name == spellClass.name && x.SourceId == classSource.Id);
+						if (clazz == null)
+							continue;
+
+						BookDto definedInSource = null;
+						if(!string.IsNullOrEmpty(spellClass.definedInSource))
+							definedInSource = Books.FirstOrDefault(x => x.ShortName == spellClass.definedInSource);
+						spell.ClassIds.Add(new SpellClassDto()
+						{
+							ClassId = clazz.Id,
+							SourceId = definedInSource?.Id,
+							IsVariant = spellClasses.ClassVariant?.Contains(spellClass) ?? false,
+						});
+					}
 				}
 			}
-			var contents = GetContent(json);
-			spell.Content = JsonConvert.SerializeObject(contents);
-			return spell;
 		}
-		public List<ContentNode> GetContent(JToken json)
+		private async Task GetConditions(SpellDto spell, JToken json)
+		{
+			var conditions = json.GetValue<string[]>("conditionInflict");
+			if (conditions == null)
+				return;
+			 spell.ConditionIds = Conditions.Where(x=> conditions.Contains(x.Name.ToLower())).Select(x=> x.Id).ToList();
+		}
+		private void GetContent(SpellDto spell, JToken json)
 		{
 			var contents = new List<ContentNode>();
-
 			foreach (var key in new[] { "entries", "entriesHigherLevel" })
 			{
 				var token = json[key];
@@ -196,167 +270,57 @@ namespace PortalQuest.Console.Commands
 					contents.Add(new HeadingNode
 					{
 						Children = new List<ContentNode>
-				{
-					new TextNode { Text = "At Higher Level" }
-				}
+						{
+							new TextNode { Text = "At Higher Level" }
+						}
 					});
 				}
 
 				contents.AddRange(JTokenTools.ParseEntry(token));
 			}
-			return contents;
+			spell.Content = JsonConvert.SerializeObject(contents);
 		}
-	}
-	public static class JTokenTools
-	{
-		public static List<ContentNode> ParseEntry(JToken token)
+		private async Task<Guid> SaveTime(TimeDto time)
 		{
-			var result = new List<ContentNode>();
-
-			if (token == null)
-				return result;
-
-			// اگر آرایه بود → روی تک تک آیتم‌ها recurse کن
-			if (token.Type == JTokenType.Array)
-			{
-				foreach (var child in token)
-					result.AddRange(ParseEntry(child));
-
-				return result;
-			}
-
-			// اگر string بود
-			if (token.Type == JTokenType.String)
-			{
-				result.Add(new ParagraphNode
-				{
-					Children = new List<ContentNode>
-			{
-				new TextNode { Text = token.ToString() }
-			}
-				});
-
-				return result;
-			}
-
-			// اگر object بود
-			if (token.Type == JTokenType.Object)
-			{
-				var type = token["type"]?.ToString();
-
-				switch (type)
-				{
-					case "entries":
-						var name = token["name"]?.ToString();
-						if (!string.IsNullOrEmpty(name))
-						{
-							result.Add(new HeadingNode
-							{
-								Children = new List<ContentNode>
-						{
-							new TextNode { Text = name }
-						}
-							});
-						}
-
-						result.AddRange(ParseEntry(token["entries"]));
-						break;
-
-					case "list":
-						var items = token["items"];
-						if (items != null)
-						{
-							foreach (var item in items)
-							{
-								result.Add(new BulletedListNode
-								{
-									Children = ParseEntry(item)
-								});
-							}
-						}
-						break;
-
-					case "table":
-						result.Add(ParseTable(token));
-						break;
-				}
-			}
-
-			return result;
+			var saved = Times.FirstOrDefault(x => 
+				x.Type == time.Type
+				&& x.Amount == time.Amount
+				&& x.Condition == time.Condition
+			);
+			if (saved != null) 
+				return saved.Id;
+			var res = await mediator.Send(new UpsertTimeRequest() { Time = time});
+			saved = res.Result!;
+			Times.Add(saved);
+			return saved.Id;
 		}
-		private static TableNode ParseTable(JToken token)
+		private async Task<Guid> SaveDuration(DurationDto duration)
 		{
-			var table = new TableNode
-			{
-				Children = new List<TableRowNode>()
-			};
-
-			var heads = token["colLabels"];
-			if (heads != null)
-			{
-				var headerRow = new TableRowNode
-				{
-					Children = heads.Select(h => new TableCellNode
-					{
-						IsHeading = true,
-						Children = new List<TextNode>
-				{
-					new TextNode { Text = h.ToString() }
-				}
-					}).ToList()
-				};
-
-				table.Children.Add(headerRow);
-			}
-
-			var rows = token["rows"];
-			if (rows != null)
-			{
-				foreach (var row in rows)
-				{
-					var rowNode = new TableRowNode
-					{
-						Children = row.Select(cell => new TableCellNode
-						{
-							Children = new List<TextNode>
-					{
-						new TextNode { Text = cell.ToString() }
-					}
-						}).ToList()
-					};
-
-					table.Children.Add(rowNode);
-				}
-			}
-
-			return table;
+			var saved = Durations.FirstOrDefault(x =>
+				x.TimeId == duration.TimeId
+				&& x.Type == duration.Type
+				&& x.Ends == duration.Ends
+			);
+			if (saved != null)
+				return saved.Id;
+			var res = await mediator.Send(new UpsertDurationRequest() { Duration = duration });
+			saved = res.Result!;
+			Durations.Add(saved);
+			return saved.Id;
 		}
-
-
-		public static T? GetValue<T>(this JToken json, params string[] keys)
+		private async Task<Guid> SaveRange(RangeDto range)
 		{
-			JToken currentValue = json;
-			foreach (var key in keys)
-			{
-				if (currentValue == null)
-					break;
-				if(int.TryParse(key, out var index))
-					currentValue = currentValue[index];
-				else
-					currentValue = currentValue[key];
-			}
-			if (currentValue == null)
-				return default(T);
-			var result = JsonConvert.SerializeObject(currentValue);
-			return JsonConvert.DeserializeObject<T>(result);
+			var saved = Ranges.FirstOrDefault(x =>
+				x.Type == range.Type
+				&& x.DistanceType == range.DistanceType
+				&& x.Amount == range.Amount
+			);
+			if (saved != null)
+				return saved.Id;
+			var res = await mediator.Send(new UpsertRangeRequest() { Range = range });
+			saved = res.Result!;
+			Ranges.Add(saved);
+			return saved.Id;
 		}
-		public static object? GetValue(this JToken json, params string[] keys)
-		{
-			return json.GetValue<object>(keys);
-		}
-	}
-	public class Container
-	{
-		public JArray Spell { get; set; }
-	}
+	}		
 }

@@ -18,6 +18,9 @@ public static class DependencyInjection
 		services.AddScoped<IClassRepository, ClassRepository>();
 		services.AddScoped<IBookRepository, BookRepository>();
 		services.AddScoped<ISpellRepository, SpellRepository>();
+		services.AddScoped<IRangeRepository, RangeRepository>();
+		services.AddScoped<ITimeRepository, TimeRepository>();
+		services.AddScoped<IDurationRepository, DurationRepository>();
 		services.AddScoped<IEffectRepository, EffectRepository>();
 		services.AddScoped<ILogRepository, LogRepository>();
 		#endregion

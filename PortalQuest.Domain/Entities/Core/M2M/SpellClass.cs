@@ -15,6 +15,6 @@ public class SpellClass
 	public Class Class { get; set; }
 	public Guid? SourceId { get; set; }
 	[ForeignKey(nameof(SourceId))]
-	public Source? DefinedInSource { get; set; }
+	public Book? DefinedInSource { get; set; }
 }
 
