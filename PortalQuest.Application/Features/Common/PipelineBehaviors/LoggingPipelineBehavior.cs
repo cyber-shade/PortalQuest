@@ -4,7 +4,7 @@ using PortalQuest.Application.Tools;
 
 namespace PortalQuest.Application.Features.Common.Pipeline
 {
-	public class LoggingPipelineBehavior<TRequest, TResponse>(ILogger logger) : IPipelineBehavior<TRequest, TResponse>
+	public class LoggingPipelineBehavior<TRequest, TResponse>(ILogRepository logger) : IPipelineBehavior<TRequest, TResponse>
 	where TRequest : IRequest<TResponse>
 	{
 		public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
