@@ -1,6 +1,6 @@
 ﻿namespace PortalQuest.Domain.Entities.Core
 {
-	public class SubClass : BaseCoreEntity
+	public class SubClass : BaseCoreContentEntity
 	{
 		#region Relations
 		#endregion
