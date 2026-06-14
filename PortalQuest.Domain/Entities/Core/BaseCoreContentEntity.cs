@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using PortalQuest.Domain.Entities.Common;
 
 namespace PortalQuest.Domain.Entities.Core
 {
-	public class BaseCoreContentEntity : BaseCoreEntity
+	public class BaseRuleEntity : BaseEntity
 	{
 		public bool SRD { get; set; }
 		public string NameInSRD { get; set; }

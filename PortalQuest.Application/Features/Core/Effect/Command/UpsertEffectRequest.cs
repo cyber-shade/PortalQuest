@@ -33,10 +33,22 @@ namespace PortalQuest.Application.Features.Core.Effect.Command
 			else
 			{
 				var isExists = await effectRepository.Any(x =>
-					x.Type == effect.Type && x.Name == effect.Name && x.SourceId == effect.SourceId
+					x.Type == effect.Type 
+					&& x.Translations.Any(t =>  t.LanguageCode == effect.LanguageCode && t.Name == effect.Name)
+					&& x.SourceId == effect.SourceId
 				);
 				effect.Id = guidService.Generate();
 				var entity = mapper.Map<Entities.Effect>(effect);
+				entity.Translations = new List<Entities.Translations.EffectTranslation>()
+				{
+					new()
+					{
+						Content = effect.Content,
+						Id = guidService.Generate(),
+						LanguageCode = effect.LanguageCode,
+						Name = effect.Name,
+					}
+				};
 				await effectRepository.Add(entity);
 			}
 			return new ResponseDto<EffectDto>()

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using PortalQuest.Domain.Entities.Core.M2M;
+using PortalQuest.Domain.Entities.Core.Translations;
 using PortalQuest.Domain.Enums.Core;
+using PortalQuest.Domain.Interfaces;
 
 namespace PortalQuest.Domain.Entities.Core
 {
-	public class Spell : BaseCoreContentEntity
+	public class Spell : BaseRuleEntity, ITranslatable<SpellTranslation>
 	{
 		public SpellLevelsEnum Level { get; set; }
 		public bool Concentration { get; set; }
@@ -17,7 +19,6 @@ namespace PortalQuest.Domain.Entities.Core
 		public bool Somatic { get; set; }
 		public bool Material { get; set; }
 		public int? MaterialCost { get; set; }
-		public string? MaterialDescription { get; set; }
 		public bool? MaterialConsume { get; set; }
 		#region Realation
 		public List<Duration> Duration { get; set; }
@@ -27,6 +28,7 @@ namespace PortalQuest.Domain.Entities.Core
 		public List<Time> CastingTime { get; set; } // O2M
 		public List<SpellClass> SpellClasses { get; set; } // M2M
 		public List<Effect> Conditions { get; set; } // M2M
+		public List<SpellTranslation> Translations { get; set; }
 		#endregion
 	}
 }

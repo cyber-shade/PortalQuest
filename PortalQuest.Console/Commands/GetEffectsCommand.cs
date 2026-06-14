@@ -6,6 +6,7 @@ using PortalQuest.Application.Features.Core.Book.Query;
 using PortalQuest.Application.Features.Core.Effect.Command;
 using PortalQuest.Console.Tools;
 using PortalQuest.Domain.Enums.Core;
+using PortalQuest.Domain.Enums.Common;
 
 namespace PortalQuest.Console.Commands
 {
@@ -34,6 +35,7 @@ namespace PortalQuest.Console.Commands
 		{
 			foreach (var item in items) {
 				var effect = new EffectDto();
+				effect.LanguageCode = LanguageCodeEnum.En;
 				var source = Books.FirstOrDefault(x => x.ShortName == item.GetValue<string>("source"));
 				if(source == null)
 					continue;

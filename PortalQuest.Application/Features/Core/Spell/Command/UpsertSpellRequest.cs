@@ -35,19 +35,31 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 			else
 			{
 				var isExists = await spellRepository.Any(x =>
-					x.Name == spell.Name && x.SourceId == spell.SourceId
+					x.Translations.Any(x => x.LanguageCode == spell.LanguageCode && x.Name == spell.Name)
+					&& x.SourceId == spell.SourceId
 				);
 				spell.Id = guidService.Generate();
 				var entity = mapper.Map<Entities.Spell>(spell);
 				entity.Duration = (await durationRepository.GetAll(x => spell.DurationIds.Contains(x.Id))).items ?? new List<Entities.Duration>();
 				entity.CastingTime = (await timeRepository.GetAll(x => spell.CastingTimeIds.Contains(x.Id))).items ?? new List<Entities.Time>();				
-				entity.Conditions = (await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id))).items ?? new List<Entities.Effect>();	
+				entity.Conditions = (await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id))).items ?? new List<Entities.Effect>();
+				entity.Translations = new List<Entities.Translations.SpellTranslation>()
+				{
+					new()
+					{
+						LanguageCode = spell.LanguageCode,
+						Content = spell.Content,
+						MaterialDescription = spell.MaterialDescription,
+						Name = spell.Name,
+						Id = guidService.Generate()
+					}
+				};
 				entity.SpellClasses = spell.ClassIds.Select(x=> new SpellClass()
 				{
 					ClassId = x.ClassId,
 					SourceId = x.SourceId,
 					IsVariant = x.IsVariant,
-				}).ToList();	
+				}).ToList();
 				await spellRepository.Add(entity);
 			}
 			return new ResponseDto<SpellDto>()

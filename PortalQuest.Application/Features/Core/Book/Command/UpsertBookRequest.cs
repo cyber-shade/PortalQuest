@@ -7,6 +7,7 @@ using PortalQuest.Application.Interfaces.Repository.Core;
 using PortalQuest.Application.Tools;
 using PortalQuest.Domain.Interfaces;
 using Entity = PortalQuest.Domain.Entities.Core;
+using PortalQuest.Domain.Entities.Core.Translations;
 
 namespace PortalQuest.Application.Features.Core.Book.Command
 {
@@ -15,34 +16,45 @@ namespace PortalQuest.Application.Features.Core.Book.Command
 		public required BookDto Book { get; set; }
 	}
 	internal class UpsertBookRequestHandler(
-		IGuidService guidService, IBookRepository sourceRepository, IMapper mapper
+		IGuidService guidService, IBookRepository bookRepository, IMapper mapper
 	) : IRequestHandler<UpsertBookRequest, ResponseDto<BookDto>>
 	{
 		public async Task<ResponseDto<BookDto>> Handle(UpsertBookRequest request, CancellationToken cancellationToken)
 		{
-			var source = request.Book;
+			var book = request.Book;
 			var toUpdate = !guidService.IsEmpty(request.Book.Id);
 			if (toUpdate)
 			{
-				var entity = await sourceRepository.Get(source.Id);
+				var entity = await bookRepository.Get(book.Id);
 				if (entity == null)
 					return ResponseFactory.DataError<BookDto>(SystemMessages.SourceNotFound);
-				entity = mapper.Map(source, entity);
-				await sourceRepository.Update(entity);
+				entity = mapper.Map(book, entity);
+				await bookRepository.Update(entity);
 			}
 			else
 			{
-				var isExists = await sourceRepository.Any(x => 
-					x.ShortName == source.ShortName || x.Name == source.Name
+				var isExists = await bookRepository.Any(x => 
+					x.Translations.Any(t=> t.Name == book.Name && t.LanguageCode == book.LanguageCode)
+					|| x.ShortName == book.ShortName 
 				);
-				source.Id = guidService.Generate();
-				var entity = mapper.Map<Entity.Book>(source);
-				await sourceRepository.Add(entity);
+				book.Id = guidService.Generate();
+				var entity = mapper.Map<Entity.Book>(book);
+				entity.Translations = new List<BookTranslation>()
+				{
+					new()
+					{
+						LanguageCode = book.LanguageCode,
+						Content = book.Content,
+						Name = book.Name,
+						Id = guidService.Generate()
+					}
+				};
+				await bookRepository.Add(entity);
 			}
 			return new ResponseDto<BookDto>() { 
 					
 				Code = ResponseCodesEnum.Ok,
-				Result = source
+				Result = book
 			};
 		}
 	}

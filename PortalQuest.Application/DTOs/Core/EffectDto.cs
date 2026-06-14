@@ -2,7 +2,7 @@
 
 namespace PortalQuest.Application.DTOs.Core
 {
-	public record EffectDto : BaseCoreEntityDto
+	public record EffectDto : BaseTranslationDto
 	{
 		public EffectTypesEnum Type { get; set; }
 		public Guid SourceId { get; set; }

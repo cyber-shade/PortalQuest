@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PortalQuest.Application.DTOs.Core;
 using PortalQuest.Application.Features.Core.Book.Command;
 using PortalQuest.Console.ViewModels.Book;
+using PortalQuest.Domain.Enums.Common;
 
 namespace PortalQuest.Console.Commands
 {
@@ -26,7 +27,8 @@ namespace PortalQuest.Console.Commands
 						ShortName = book.id,
 						Author = book.author,
 						PublishedDateTime = book.published,
-						Content = string.Empty
+						Content = string.Empty,
+						LanguageCode = LanguageCodeEnum.En
 					}
 				});
 			}

@@ -5,6 +5,7 @@ using PortalQuest.Application.DTOs.Common;
 using PortalQuest.Application.DTOs.Core;
 using PortalQuest.Application.Interfaces.Repository.Core;
 using PortalQuest.Application.Tools;
+using PortalQuest.Domain.Entities.Core.Translations;
 using PortalQuest.Domain.Interfaces;
 using Entity = PortalQuest.Domain.Entities.Core;
 
@@ -33,11 +34,26 @@ namespace PortalQuest.Application.Features.Core.Class.Command
 			else
 			{
 				var isExists = await classRepository.Any(x => 
-					x.Name == clazz.Name && x.SourceId == clazz.SourceId
+					x.Translations.Any(t => t.LanguageCode == clazz.LanguageCode && t.Name == clazz.Name)
+					&& x.SourceId == clazz.SourceId
 				);
 				clazz.Id = guidService.Generate();
 				var entity = mapper.Map<Entity.Class>(clazz);
-				await classRepository.Add(entity);
+				entity.NameInSRD = entity.NameInSRD ?? string.Empty;
+				entity.Translations = new List<ClassTranslation>()
+				{
+					new()
+					{
+						LanguageCode = clazz.LanguageCode,
+						Content = clazz.Content,
+						Name = clazz.Name,
+						Id = guidService.Generate()
+					}
+				};
+					await classRepository.Add(entity);
+
+
+				
 			}
 			return new ResponseDto<ClassDto>() { 
 					

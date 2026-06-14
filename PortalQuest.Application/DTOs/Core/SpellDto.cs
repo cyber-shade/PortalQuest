@@ -2,7 +2,7 @@
 
 namespace PortalQuest.Application.DTOs.Core
 {
-	public record SpellDto : BaseCoreEntityDto
+	public record SpellDto : BaseTranslationDto
 	{
 		public int SourcePage { get; set; }
 		public bool SRD { get; set; }

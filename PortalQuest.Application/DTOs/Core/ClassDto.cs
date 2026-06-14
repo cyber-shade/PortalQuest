@@ -1,6 +1,6 @@
 ﻿namespace PortalQuest.Application.DTOs.Core
 {
-	public record ClassDto : BaseCoreEntityDto
+	public record ClassDto : BaseTranslationDto
 	{
 		public Guid SourceId { get; set; }
 	}

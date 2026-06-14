@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Newtonsoft.Json;
 using PortalQuest.Application.DTOs.Core;
-using PortalQuest.Application.Features.Core.Book.Command;
 using PortalQuest.Application.Features.Core.Book.Query;
 using PortalQuest.Application.Features.Core.Class.Command;
 using PortalQuest.Console.Constants;
 using PortalQuest.Console.ViewModels.Class;
+using PortalQuest.Domain.Enums.Common;
 
 namespace PortalQuest.Console.Commands
 {
@@ -50,7 +50,8 @@ namespace PortalQuest.Console.Commands
 					{
 						Name = clazz.name,
 						SourceId = Books.FirstOrDefault(x => x.ShortName == clazz.source)!.Id,
-						Content = string.Empty
+						Content = string.Empty,
+						LanguageCode = LanguageCodeEnum.En
 					}
 				});
 			}

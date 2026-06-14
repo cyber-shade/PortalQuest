@@ -17,6 +17,7 @@ using PortalQuest.Domain.Contents;
 using PortalQuest.Domain.Enums.Core;
 using PortalQuest.Console.Tools;
 using PortalQuest.Application.Features.Core.Effect.Query;
+using PortalQuest.Domain.Enums.Common;
 
 namespace PortalQuest.Console.Commands
 {
@@ -80,6 +81,7 @@ namespace PortalQuest.Console.Commands
 		private async Task SaveSpell(JToken json)
 		{
 			var spell = new SpellDto();
+			spell.LanguageCode = LanguageCodeEnum.En;
 			spell.Name = json.GetValue<string>("name") ?? "";
 			var sourceName = json.GetValue<string>("source");
 			var source = Books.FirstOrDefault(x => x.ShortName == sourceName);
