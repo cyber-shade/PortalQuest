@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using PortalQuest.Application.Interfaces.Repository.Common;
-using PortalQuest.Application.Tools;
 
 namespace PortalQuest.Application.Features.Common.Pipeline
 {
@@ -16,8 +15,7 @@ namespace PortalQuest.Application.Features.Common.Pipeline
 			}
 			catch (Exception ex) {
 				await logger.Log($"{ex.Message}; {ex.InnerException};", typeof(TRequest).Name, Domain.Enums.Common.LogLevelEnum.Error);
-				var errorResponse = ResponseFactory.ServerError();
-				return (TResponse)(object)errorResponse;
+				throw;
 			}
 		}
 	}
