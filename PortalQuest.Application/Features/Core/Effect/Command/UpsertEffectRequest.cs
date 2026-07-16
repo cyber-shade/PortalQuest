@@ -4,6 +4,7 @@ using PortalQuest.Application.Constants;
 using PortalQuest.Application.DTOs.Common;
 using PortalQuest.Application.DTOs.Core;
 using PortalQuest.Application.Interfaces.Repository.Core;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 using PortalQuest.Application.Tools;
 using PortalQuest.Domain.Interfaces;
 using Entities = PortalQuest.Domain.Entities.Core;
@@ -15,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Effect.Command
 		public required EffectDto Effect { get; set; }
 	}
 	internal class UpsertEffectRequestHandler(
-		IEffectRepository effectRepository, IMediator mediator, IMapper mapper, IGuidService guidService
+		IEffectRepository effectRepository, IMediator mediator, IMapper mapper, IGuidService guidService, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertEffectRequest, ResponseDto<EffectDto>>
 	{
 		public async Task<ResponseDto<EffectDto>> Handle(UpsertEffectRequest request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ namespace PortalQuest.Application.Features.Core.Effect.Command
 				if (entity == null)
 					return ResponseFactory.DataError<EffectDto>(SystemMessages.EffectNotFound);
 				entity = mapper.Map(effect, entity);
-				await effectRepository.Update(entity);
+				effectRepository.Update(entity);
 			}
 			else
 			{
@@ -51,6 +52,7 @@ namespace PortalQuest.Application.Features.Core.Effect.Command
 				};
 				await effectRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<EffectDto>()
 			{
 				Code = ResponseCodesEnum.Ok,

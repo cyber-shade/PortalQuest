@@ -16,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Duration.Query
 	{
 		public async Task<ResponseDto<List<DurationDto>>> Handle(GetDurationsListRequest request, CancellationToken cancellationToken)
 		{
-			var durations = (await durationRepository.GetAll()).items;		
+			var durations = await durationRepository.GetAll(cancellationToken : cancellationToken);		
 			var model = mapper.Map<List<DurationDto>>(durations);
 			return ResponseFactory.FillObject<List<DurationDto>>(model);
 		}

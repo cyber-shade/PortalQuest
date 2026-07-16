@@ -16,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Book.Query
 	{
 		public async Task<ResponseDto<List<BookDto>>> Handle(GetBooksListRequest request, CancellationToken cancellationToken)
 		{
-			var books = (await bookRepository.GetAll()).items;
+			var books = await bookRepository.GetAll(cancellationToken: cancellationToken);
 			var model = mapper.Map<List<BookDto>>(books);	
 			return ResponseFactory.FillObject<List<BookDto>>(model);
 		}

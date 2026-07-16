@@ -7,6 +7,7 @@ using PortalQuest.Application.Interfaces.Repository.Core;
 using PortalQuest.Application.Tools;
 using Entities = PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Interfaces;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 
 namespace PortalQuest.Application.Features.Core.Range.Command
 {
@@ -15,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Range.Command
 		public required RangeDto Range { get; set; }
 	}
 	internal class UpsertRangeRequestHandler(
-		IRangeRepository rangeRepository, IMapper mapper, IGuidService guidService	
+		IRangeRepository rangeRepository, IMapper mapper, IGuidService guidService, IUnitOfWork unitOfWork	
 	) : IRequestHandler<UpsertRangeRequest, ResponseDto<RangeDto>>
 	{
 		public async Task<ResponseDto<RangeDto>> Handle(UpsertRangeRequest request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ namespace PortalQuest.Application.Features.Core.Range.Command
 				if (entity == null)
 					return ResponseFactory.DataError<RangeDto>(SystemMessages.RangeNotFound);
 				entity = mapper.Map(range, entity);
-				await rangeRepository.Update(entity);
+				rangeRepository.Update(entity);
 			}
 			else
 			{
@@ -41,6 +42,7 @@ namespace PortalQuest.Application.Features.Core.Range.Command
 				var entity = mapper.Map<Entities.Range>(range);
 				await rangeRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<RangeDto>()
 			{
 				Code = ResponseCodesEnum.Ok,

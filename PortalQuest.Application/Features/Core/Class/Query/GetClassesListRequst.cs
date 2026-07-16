@@ -16,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Class.Query
 	{
 		public async Task<ResponseDto<List<ClassDto>>> Handle(GetClassesListRequst request, CancellationToken cancellationToken)
 		{
-			var classes = (await classRepository.GetAll()).items;
+			var classes = await classRepository.GetAll(cancellationToken: cancellationToken);
 			var model = mapper.Map<List<ClassDto>>( classes );
 			return ResponseFactory.FillObject<List<ClassDto>>(model);
 		}

@@ -2,12 +2,13 @@
 using MediatR;
 using PortalQuest.Application.Constants;
 using PortalQuest.Application.DTOs.Common;
-using PortalQuest.Application.DTOs.Core;
+using PortalQuest.Application.DTOs.Core.Spells;
 using PortalQuest.Application.Interfaces.Repository.Core;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 using PortalQuest.Application.Tools;
-using Entities = PortalQuest.Domain.Entities.Core;
-using PortalQuest.Domain.Interfaces;
 using PortalQuest.Domain.Entities.Core.M2M;
+using PortalQuest.Domain.Interfaces;
+using Entities = PortalQuest.Domain.Entities.Core;
 
 namespace PortalQuest.Application.Features.Core.Spell.Command
 {
@@ -17,7 +18,7 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 	}
 	internal class UpsertSpellRequestHandler(
 		ISpellRepository spellRepository, IMapper mapper, IGuidService guidService,
-		IDurationRepository durationRepository, ITimeRepository timeRepository, IEffectRepository effectRepository
+		IDurationRepository durationRepository, ITimeRepository timeRepository, IEffectRepository effectRepository, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertSpellRequest, ResponseDto<SpellDto>>
 	{
 		public async Task<ResponseDto<SpellDto>> Handle(UpsertSpellRequest request, CancellationToken cancellationToken)
@@ -30,7 +31,7 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 				if (entity == null)
 					return ResponseFactory.DataError<SpellDto>(SystemMessages.SpellNotFound);
 				entity = mapper.Map(spell, entity);
-				await spellRepository.Update(entity);
+				spellRepository.Update(entity);
 			}
 			else
 			{
@@ -40,9 +41,9 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 				);
 				spell.Id = guidService.Generate();
 				var entity = mapper.Map<Entities.Spell>(spell);
-				entity.Duration = (await durationRepository.GetAll(x => spell.DurationIds.Contains(x.Id))).items ?? new List<Entities.Duration>();
-				entity.CastingTime = (await timeRepository.GetAll(x => spell.CastingTimeIds.Contains(x.Id))).items ?? new List<Entities.Time>();				
-				entity.Conditions = (await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id))).items ?? new List<Entities.Effect>();
+				entity.Duration = await durationRepository.GetAll(x => spell.DurationIds.Contains(x.Id)) ?? new List<Entities.Duration>();
+				entity.CastingTime = await timeRepository.GetAll(x => spell.CastingTimeIds.Contains(x.Id)) ?? new List<Entities.Time>();				
+				entity.Conditions = await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id)) ?? new List<Entities.Effect>();
 				entity.Translations = new List<Entities.Translations.SpellTranslation>()
 				{
 					new()
@@ -62,6 +63,7 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 				}).ToList();
 				await spellRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<SpellDto>()
 			{
 				Code = ResponseCodesEnum.Ok,

@@ -8,6 +8,7 @@ using PortalQuest.Application.Tools;
 using PortalQuest.Domain.Interfaces;
 using Entity = PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Entities.Core.Translations;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 
 namespace PortalQuest.Application.Features.Core.Book.Command
 {
@@ -16,7 +17,7 @@ namespace PortalQuest.Application.Features.Core.Book.Command
 		public required BookDto Book { get; set; }
 	}
 	internal class UpsertBookRequestHandler(
-		IGuidService guidService, IBookRepository bookRepository, IMapper mapper
+		IGuidService guidService, IBookRepository bookRepository, IMapper mapper, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertBookRequest, ResponseDto<BookDto>>
 	{
 		public async Task<ResponseDto<BookDto>> Handle(UpsertBookRequest request, CancellationToken cancellationToken)
@@ -29,7 +30,7 @@ namespace PortalQuest.Application.Features.Core.Book.Command
 				if (entity == null)
 					return ResponseFactory.DataError<BookDto>(SystemMessages.SourceNotFound);
 				entity = mapper.Map(book, entity);
-				await bookRepository.Update(entity);
+				bookRepository.Update(entity);
 			}
 			else
 			{
@@ -51,6 +52,7 @@ namespace PortalQuest.Application.Features.Core.Book.Command
 				};
 				await bookRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<BookDto>() { 
 					
 				Code = ResponseCodesEnum.Ok,

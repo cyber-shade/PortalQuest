@@ -16,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Range.Query
 	{
 		public async Task<ResponseDto<List<RangeDto>>> Handle(GetRangesListRequest request, CancellationToken cancellationToken)
 		{
-			var ranges = (await rangeRepository.GetAll()).items;
+			var ranges = await rangeRepository.GetAll(cancellationToken: cancellationToken);
 			var model = mapper.Map<List<RangeDto>>(ranges);
 			return ResponseFactory.FillObject<List<RangeDto>>(model);
 		}

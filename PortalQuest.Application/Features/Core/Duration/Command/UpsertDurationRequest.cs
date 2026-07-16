@@ -7,6 +7,7 @@ using PortalQuest.Application.Interfaces.Repository.Core;
 using PortalQuest.Application.Tools;
 using Entities = PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Interfaces;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 
 namespace PortalQuest.Application.Features.Core.Duration.Command
 {
@@ -15,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Duration.Command
 		public required DurationDto Duration { get; set; }
 	}
 	internal class UpsertDurationRequestHandler(
-		IDurationRepository durationRepository, IMapper mapper, IGuidService guidService
+		IDurationRepository durationRepository, IMapper mapper, IGuidService guidService, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertDurationRequest, ResponseDto<DurationDto>>
 	{
 		public async Task<ResponseDto<DurationDto>> Handle(UpsertDurationRequest request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ namespace PortalQuest.Application.Features.Core.Duration.Command
 				if (entity == null)
 					return ResponseFactory.DataError<DurationDto>(SystemMessages.TimeNotFound);
 				entity = mapper.Map(duration, entity);
-				await durationRepository.Update(entity);
+				durationRepository.Update(entity);
 			}
 			else
 			{
@@ -41,6 +42,7 @@ namespace PortalQuest.Application.Features.Core.Duration.Command
 				var entity = mapper.Map<Entities.Duration>(duration);
 				await durationRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<DurationDto>()
 			{
 				Code = ResponseCodesEnum.Ok,

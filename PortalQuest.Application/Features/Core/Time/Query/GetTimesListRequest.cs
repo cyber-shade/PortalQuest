@@ -16,7 +16,7 @@ namespace PortalQuest.Application.Features.Core.Time.Query
 	{
 		public async Task<ResponseDto<List<TimeDto>>> Handle(GetTimesListRequest request, CancellationToken cancellationToken)
 		{
-			var times = (await timeRepository.GetAll()).items;
+			var times = await timeRepository.GetAll(cancellationToken: cancellationToken);
 			var model = mapper.Map<List<TimeDto>>(times);
 			return ResponseFactory.FillObject<List<TimeDto>>(model);
 		}

@@ -4,6 +4,7 @@ using PortalQuest.Application.Constants;
 using PortalQuest.Application.DTOs.Common;
 using PortalQuest.Application.DTOs.Core;
 using PortalQuest.Application.Interfaces.Repository.Core;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 using PortalQuest.Application.Tools;
 using PortalQuest.Domain.Entities.Core.Translations;
 using PortalQuest.Domain.Interfaces;
@@ -16,7 +17,7 @@ namespace PortalQuest.Application.Features.Core.Class.Command
 		public required ClassDto Class { get; set; }
 	}
 	internal class UpsertClassRequestHandler(
-		IGuidService guidService, IClassRepository classRepository, IMapper mapper
+		IGuidService guidService, IClassRepository classRepository, IMapper mapper, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertClassRequest, ResponseDto<ClassDto>>
 	{
 		public async Task<ResponseDto<ClassDto>> Handle(UpsertClassRequest request, CancellationToken cancellationToken)
@@ -29,7 +30,7 @@ namespace PortalQuest.Application.Features.Core.Class.Command
 				if (entity == null)
 					return ResponseFactory.DataError<ClassDto>(SystemMessages.ClassNotFound);
 				entity = mapper.Map(clazz, entity);
-				await classRepository.Update(entity);
+				classRepository.Update(entity);
 			}
 			else
 			{
@@ -50,11 +51,9 @@ namespace PortalQuest.Application.Features.Core.Class.Command
 						Id = guidService.Generate()
 					}
 				};
-					await classRepository.Add(entity);
-
-
-				
+				await classRepository.Add(entity);
 			}
+			await unitOfWork.SaveChangesAsync();
 			return new ResponseDto<ClassDto>() { 
 					
 				Code = ResponseCodesEnum.Ok,
