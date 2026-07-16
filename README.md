@@ -38,3 +38,10 @@ PortalQuest provides a foundation for managing characters, spells, races, classe
 dotnet ef database update
 dotnet run
 ```
+
+# For Production
+``` bash
+docker compose build 
+docker compose up -d
+```
+
