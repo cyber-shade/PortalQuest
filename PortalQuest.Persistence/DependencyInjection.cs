@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PortalQuest.Application.Interfaces.Repository.Common;
 using PortalQuest.Application.Interfaces.Repository.Core;
+using PortalQuest.Application.Interfaces.UnitOfWork;
 using PortalQuest.Persistence.Context;
 using PortalQuest.Persistence.Repository.Common;
 using PortalQuest.Persistence.Repository.Core;
@@ -23,6 +24,7 @@ public static class DependencyInjection
 		services.AddScoped<IDurationRepository, DurationRepository>();
 		services.AddScoped<IEffectRepository, EffectRepository>();
 		services.AddScoped<ILogRepository, LogRepository>();
+		services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 		#endregion
 		return services;
 	}

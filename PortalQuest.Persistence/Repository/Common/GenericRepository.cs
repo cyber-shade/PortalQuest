@@ -1,91 +1,93 @@
-﻿using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
-using PortalQuest.Application.Interfaces.Repository.Common;
+﻿using PortalQuest.Application.Interfaces.Repository.Common;
 using PortalQuest.Domain.Entities.Common;
 using PortalQuest.Persistence.Context;
 
 namespace PortalQuest.Persistence.Repository.Common;
+
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using PortalQuest.Application.DTOs.Common;
+using PortalQuest.Application.Specifications;
+using PortalQuest.Persistence.Specifications;
+
 public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 {
 	private readonly PortalQuestDbContext _dbContext;
+	private readonly DbSet<T> _set;
+
 	public GenericRepository(PortalQuestDbContext dbContext)
 	{
 		_dbContext = dbContext;
-	}
-	public async Task Add(T entity)
-	{
-		await _dbContext.AddAsync(entity);
-		await _dbContext.SaveChangesAsync();
+		_set = dbContext.Set<T>();
 	}
 
-	public async Task<bool> Any(Expression<Func<T, bool>> where)
+	public async Task<T?> Get(Guid id, CancellationToken cancellationToken = default)
+		=> await _set.FindAsync(new object[] { id }, cancellationToken);
+
+	public async Task<T?> FirstOrDefault(ISpecification<T> spec, CancellationToken cancellationToken = default)
 	{
-		return await _dbContext.Set<T>().AnyAsync(where);
+		var query = SpecificationEvaluator<T>.GetQuery(_set.AsQueryable(), spec, applyPaging: false);
+		return await query.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<T?> FirstOrDefault(Expression<Func<T, bool>> where, 
-		Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-		Func<IQueryable<T>, IQueryable<T>>? include = null)
+	public async Task<PagedResultDto<T>> GetAll(ISpecification<T> spec, CancellationToken cancellationToken = default)
 	{
-		IQueryable<T> query = _dbContext.Set<T>();
-		if(include != null)
+		var filteredQuery = SpecificationEvaluator<T>.GetQuery(_set.AsQueryable(), spec, applyPaging: false);
+		var totalCount = await filteredQuery.CountAsync(cancellationToken);
+
+		var pagedQuery = spec.IsPagingEnabled
+			? filteredQuery.Skip(spec.Skip).Take(spec.Take)
+			: filteredQuery;
+
+		var items = await pagedQuery.ToListAsync(cancellationToken);
+
+		return new PagedResultDto<T>
 		{
-			query = include(query);
+			Items = items,
+			TotalCount = totalCount,
+			Skip = spec.Skip,
+			Take = spec.Take
+		};
+	}
+	public async Task<List<T>> GetAll(Expression<Func<T, bool>>? where = null,  CancellationToken cancellationToken = default)
+		=> await _set.AsNoTracking().Where(where).ToListAsync(cancellationToken);
+	public async Task<bool> Any(Expression<Func<T, bool>> where, CancellationToken cancellationToken = default)
+		=> await _set.AnyAsync(where, cancellationToken);
 
-			// Optional: Split query if includes are too heavy
-			query = query.AsSplitQuery();
-		}
-		if (orderBy != null)
-			query = orderBy(query);
-		return await query.FirstOrDefaultAsync(where);
+	public async Task<int> Count(ISpecification<T> spec, CancellationToken cancellationToken = default)
+	{
+		var query = SpecificationEvaluator<T>.GetQuery(_set.AsQueryable(), spec, applyPaging: false);
+		return await query.CountAsync(cancellationToken);
 	}
 
-	public async Task<T?> Get(Guid id)
+	public async Task Add(T entity, CancellationToken cancellationToken = default)
+		=> await _set.AddAsync(entity, cancellationToken);
+
+	public async Task AddRange(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+		=> await _set.AddRangeAsync(entities, cancellationToken);
+
+	public void Update(T entity)
+		=> _set.Update(entity);
+
+	public void UpdateRange(IEnumerable<T> entities)
+		=> _set.UpdateRange(entities);
+
+	public async Task SoftDelete(Guid id, CancellationToken cancellationToken = default)
 	{
-		return await _dbContext.Set<T>().FindAsync(id);
-	}
-
-	public async Task<(List<T> items, int count)> GetAll(Expression<Func<T, bool>> where = null,
-			Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-			Func<IQueryable<T>, IQueryable<T>>? include = null,
-			int skip = 0, int take = int.MaxValue)
-	{
-		IQueryable<T> query = _dbContext.Set<T>();
-		if (include != null)
-		{
-			query = include(query);
-
-			// Optional: Split query if includes are too heavy
-			query = query.AsSplitQuery();
-		}
-		if (where != null)
-			query = query.Where(where);
-
-		var totalCount = await query.CountAsync();
-
-		if (orderBy != null)
-			query = orderBy(query);
-
-		var items = await query.Skip(skip).Take(take).ToListAsync();
-
-		return (items, totalCount);
-	}
-
-	public async Task SoftDelete(Guid id)
-	{
-		T? entity = await Get(id);
+		var entity = await Get(id, cancellationToken);
 		if (entity != null && !entity.IsDeleted)
-			await SoftDelete(entity);
+			SoftDelete(entity);
 	}
-	public async Task SoftDelete(T entity)
+
+	public void SoftDelete(T entity)
 	{
 		entity.IsDeleted = true;
-		await Update(entity);
+		_set.Update(entity);
 	}
 
-	public async Task Update(T entity)
-	{
-		_dbContext.Update(entity);
-		await _dbContext.SaveChangesAsync();
-	}
+	public void Remove(T entity)
+		=> _set.Remove(entity);
+
+	public void RemoveRange(IEnumerable<T> entities)
+		=> _set.RemoveRange(entities);
 }

@@ -1,4 +1,6 @@
-﻿using PortalQuest.Web.Middlewares;
+﻿using PortalQuest.Application.Interfaces.Services;
+using PortalQuest.Web.Middlewares;
+using PortalQuest.Web.Services;
 using Serilog;
 
 namespace PortalQuest.Web
@@ -6,6 +8,11 @@ namespace PortalQuest.Web
 	public static class DependencyInjection
 	{
 		public static IServiceCollection AddWebServices(this IServiceCollection services, IConfiguration configuration) {
+			services.AddScoped<CurrentLanguageService>();
+			services.AddScoped<ICurrentLanguageService>(sp => sp.GetRequiredService<CurrentLanguageService>());
+			services.AddScoped<ICurrentLanguageSetter>(sp => sp.GetRequiredService<CurrentLanguageService>());
+			services.AddScoped<LanguageResolverMiddleware>();
+
 			services.AddControllers();
 
 			services.AddEndpointsApiExplorer();
@@ -24,6 +31,7 @@ namespace PortalQuest.Web
 			app.UseMiddleware<CorrelationIdMiddleware>();
 			app.UseSerilogRequestLogging();
 			app.UseMiddleware<ExceptionHandlingMiddleware>();
+			app.UseMiddleware<LanguageResolverMiddleware>();
 
 			return app;
 		}
