@@ -18,6 +18,7 @@ using PortalQuest.Domain.Enums.Core;
 using PortalQuest.Console.Tools;
 using PortalQuest.Application.Features.Core.Effect.Query;
 using PortalQuest.Domain.Enums.Common;
+using PortalQuest.Application.DTOs.Core.Spells;
 
 namespace PortalQuest.Console.Commands
 {

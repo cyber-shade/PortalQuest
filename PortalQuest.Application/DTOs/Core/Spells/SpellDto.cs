@@ -1,6 +1,6 @@
 ﻿using PortalQuest.Domain.Enums.Core;
 
-namespace PortalQuest.Application.DTOs.Core
+namespace PortalQuest.Application.DTOs.Core.Spells
 {
 	public record SpellDto : BaseTranslationDto
 	{

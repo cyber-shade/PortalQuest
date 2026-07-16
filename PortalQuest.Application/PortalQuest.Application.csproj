@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Core\Spell\Query\" />
+    <Folder Include="Features\Common\Specifications\" />
   </ItemGroup>
 
 </Project>

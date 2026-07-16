@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using PortalQuest.Application.DTOs.Core;
+using PortalQuest.Application.DTOs.Core.Spells;
 using PortalQuest.Domain.Entities.Core;
 using PortalQuest.Domain.Entities.Core.M2M;
 
