@@ -3,7 +3,7 @@ using PortalQuest.Domain.Enums.Core;
 
 namespace PortalQuest.Application.DTOs.Core
 {
-	public record RangeDto : BaseEntityDto
+	public record RangeDto
 	{
 		public RangeTypeEnum Type { get; set; }
 		public DistanceTypeEnum DistanceType { get; set; }

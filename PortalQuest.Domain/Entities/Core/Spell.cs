@@ -3,6 +3,7 @@ using PortalQuest.Domain.Entities.Core.M2M;
 using PortalQuest.Domain.Entities.Core.Translations;
 using PortalQuest.Domain.Enums.Core;
 using PortalQuest.Domain.Interfaces;
+using PortalQuest.Domain.ValueObjects.Core;
 
 namespace PortalQuest.Domain.Entities.Core
 {
@@ -20,12 +21,12 @@ namespace PortalQuest.Domain.Entities.Core
 		public bool Material { get; set; }
 		public int? MaterialCost { get; set; }
 		public bool? MaterialConsume { get; set; }
+		#region Owned value objects
+		public List<Duration> Durations { get; set; }
+		public Domain.ValueObjects.Core.Range Range { get; set; }
+		public List<Time> CastingTimes { get; set; } // O2M
+		#endregion
 		#region Realation
-		public List<Duration> Duration { get; set; }
-		public Guid RangeId { get; set; }
-		[ForeignKey(nameof(RangeId))]
-		public Range Range { get; set; }
-		public List<Time> CastingTime { get; set; } // O2M
 		public List<SpellClass> SpellClasses { get; set; } // M2M
 		public List<Effect> Conditions { get; set; } // M2M
 		public List<SpellTranslation> Translations { get; set; }

@@ -3,7 +3,7 @@ using PortalQuest.Domain.Enums.Core;
 
 namespace PortalQuest.Application.DTOs.Core
 {
-	public record TimeDto : BaseEntityDto
+	public record TimeDto
 	{
 		public int Amount { get; set; }
 		public TimeTypeEnum Type { get; set; }

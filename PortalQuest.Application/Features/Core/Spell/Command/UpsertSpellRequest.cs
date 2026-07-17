@@ -18,7 +18,7 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 	}
 	internal class UpsertSpellRequestHandler(
 		ISpellRepository spellRepository, IMapper mapper, IGuidService guidService,
-		IDurationRepository durationRepository, ITimeRepository timeRepository, IEffectRepository effectRepository, IUnitOfWork unitOfWork
+		IEffectRepository effectRepository, IUnitOfWork unitOfWork
 	) : IRequestHandler<UpsertSpellRequest, ResponseDto<SpellDto>>
 	{
 		public async Task<ResponseDto<SpellDto>> Handle(UpsertSpellRequest request, CancellationToken cancellationToken)
@@ -41,9 +41,7 @@ namespace PortalQuest.Application.Features.Core.Spell.Command
 				);
 				spell.Id = guidService.Generate();
 				var entity = mapper.Map<Entities.Spell>(spell);
-				entity.Duration = await durationRepository.GetAll(x => spell.DurationIds.Contains(x.Id)) ?? new List<Entities.Duration>();
-				entity.CastingTime = await timeRepository.GetAll(x => spell.CastingTimeIds.Contains(x.Id)) ?? new List<Entities.Time>();				
-				entity.Conditions = await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id)) ?? new List<Entities.Effect>();
+				entity.Conditions = await effectRepository.GetAll(x=> spell.ConditionIds.Contains(x.Id), false) ?? new List<Entities.Effect>();
 				entity.Translations = new List<Entities.Translations.SpellTranslation>()
 				{
 					new()

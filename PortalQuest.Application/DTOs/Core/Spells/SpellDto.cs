@@ -21,11 +21,11 @@ namespace PortalQuest.Application.DTOs.Core.Spells
 		public int? MaterialCost { get; set; }
 		public string? MaterialDescription { get; set; }
 		public bool? MaterialConsume { get; set; }
-		public List<Guid> DurationIds { get; set; } = new List<Guid>();
+		public RangeDto Range { get; set; }
+		public List<DurationDto> Durations { get; set; } = new();
+		public List<TimeDto> CastingTimes { get; set; } = new();
 		public List<SpellClassDto> ClassIds { get; set; } = new List<SpellClassDto>();
-		public Guid RangeId { get; set; }
 		public Guid SourceId { get; set; }
-		public List<Guid> CastingTimeIds { get; set; } = new List<Guid>();
 		public List<Guid> ConditionIds { get; set; } = new List<Guid>();
 
 	}
