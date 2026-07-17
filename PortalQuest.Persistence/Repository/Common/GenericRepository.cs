@@ -49,8 +49,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
 			Take = spec.Take
 		};
 	}
-	public async Task<List<T>> GetAll(Expression<Func<T, bool>>? where = null,  CancellationToken cancellationToken = default)
-		=> await _set.AsNoTracking().Where(where).ToListAsync(cancellationToken);
+	public async Task<List<T>> GetAll(Expression<Func<T, bool>>? where = null, bool asNoTracking = true,  CancellationToken cancellationToken = default)
+	{
+		var query = asNoTracking ? _set.AsNoTracking() : _set.AsTracking();
+		if(where != null)
+		{
+			query = query.Where(where);
+		}
+		return await query.ToListAsync(cancellationToken);
+	}
 	public async Task<bool> Any(Expression<Func<T, bool>> where, CancellationToken cancellationToken = default)
 		=> await _set.AnyAsync(where, cancellationToken);
 

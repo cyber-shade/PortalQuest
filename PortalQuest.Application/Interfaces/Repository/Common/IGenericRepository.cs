@@ -8,7 +8,7 @@ public interface IGenericRepository<T> where T : BaseEntity
 	Task<T?> Get(Guid id, CancellationToken cancellationToken = default);
 	Task<T?> FirstOrDefault(ISpecification<T> spec, CancellationToken cancellationToken = default);
 	Task<PagedResultDto<T>> GetAll(ISpecification<T> spec, CancellationToken cancellationToken = default);
-	Task<List<T>> GetAll(Expression<Func<T, bool>>? where = null, CancellationToken cancellationToken = default);
+	Task<List<T>> GetAll(Expression<Func<T, bool>>? where = null, bool asNoTracking = true, CancellationToken cancellationToken = default);
 
 	Task<bool> Any(Expression<Func<T, bool>> where, CancellationToken cancellationToken = default);
 	Task<int> Count(ISpecification<T> spec, CancellationToken cancellationToken = default);

@@ -2,23 +2,17 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PortalQuest.Application.DTOs.Core;
+using PortalQuest.Application.DTOs.Core.Spells;
 using PortalQuest.Application.Features.Core.Book.Query;
 using PortalQuest.Application.Features.Core.Class.Query;
-using PortalQuest.Application.Features.Core.Duration.Command;
-using PortalQuest.Application.Features.Core.Duration.Query;
-using PortalQuest.Application.Features.Core.Range.Command;
-using PortalQuest.Application.Features.Core.Range.Query;
+using PortalQuest.Application.Features.Core.Effect.Query;
 using PortalQuest.Application.Features.Core.Spell.Command;
-using PortalQuest.Application.Features.Core.Time.Command;
-using PortalQuest.Application.Features.Core.Time.Query;
 using PortalQuest.Console.Constants;
+using PortalQuest.Console.Tools;
 using PortalQuest.Console.ViewModels.Spell;
 using PortalQuest.Domain.Contents;
-using PortalQuest.Domain.Enums.Core;
-using PortalQuest.Console.Tools;
-using PortalQuest.Application.Features.Core.Effect.Query;
 using PortalQuest.Domain.Enums.Common;
-using PortalQuest.Application.DTOs.Core.Spells;
+using PortalQuest.Domain.Enums.Core;
 
 namespace PortalQuest.Console.Commands
 {
@@ -30,18 +24,12 @@ namespace PortalQuest.Console.Commands
 		private List<BookDto> Books { get; set; }
 		private List<ClassDto> Classes { get; set; }
 		private List<EffectDto> Conditions { get; set; }
-		private List<RangeDto> Ranges { get; set; }
-		private List<TimeDto> Times { get; set; }
-		private List<DurationDto> Durations { get; set; }
 		private Dictionary<string, Dictionary<string, SpellClassesVM>> SpellClasses { get; set; }
 
 		public async Task ExecuteAsync()
 		{
 			Books = (await mediator.Send(new GetBooksListRequest())).Result ?? new List<BookDto>();
 			Classes = (await mediator.Send(new GetClassesListRequst())).Result ?? new List<ClassDto>();
-			Ranges = (await mediator.Send(new GetRangesListRequest())).Result ?? new List<RangeDto>();
-			Times = (await mediator.Send(new GetTimesListRequest())).Result ?? new List<TimeDto>();
-			Durations = (await mediator.Send(new GetDurationsListRequest())).Result ?? new List<DurationDto>();
 			Conditions = (await mediator.Send(new GetEffectsListRequest()
 			{
 				Type = EffectTypesEnum.Condition
@@ -161,7 +149,6 @@ namespace PortalQuest.Console.Commands
 		}
 		private async Task GetDurations(SpellDto spell, JToken json)
 		{
-			spell.DurationIds = new List<Guid>();
 			var durationObjects = json.GetValue<object[]>("duration");
 			if (durationObjects != null)
 			{
@@ -181,19 +168,18 @@ namespace PortalQuest.Console.Commands
 								time.Type = timeParsed;
 							time.Amount = json.GetValue<int>("duration", i.ToString(), "duration", "amount");
 							time.Condition = json.GetValue<string>("duration", i.ToString(), "duration", "condition") ?? string.Empty;
-							duration.TimeId = await SaveTime(time);
+							duration.Time = time;
 							break;
 						case DurationTypeEnum.Permanent:
 							duration.Ends = json.GetValue<List<string>>("duration", i.ToString(), "ends") ?? new List<string>();
 							break;
 					}
-					spell.DurationIds.Add(await SaveDuration(duration));
+					spell.Durations.Add(duration);
 				}
 			}
 		}
 		private async Task GetTimes(SpellDto spell, JToken json)
 		{
-			spell.CastingTimeIds = new List<Guid>();
 			var timeObjects = json.GetValue<object[]>("time");
 			if (timeObjects != null)
 			{
@@ -204,7 +190,7 @@ namespace PortalQuest.Console.Commands
 						time.Type = parsed;
 					time.Amount = json.GetValue<int>("time", i.ToString(), "number");
 					time.Condition = json.GetValue<string>("time", i.ToString(), "condition") ?? string.Empty;
-					spell.CastingTimeIds.Add(await SaveTime(time));
+					spell.CastingTimes.Add(time);
 				}
 			}
 		}
@@ -223,7 +209,7 @@ namespace PortalQuest.Console.Commands
 					if (range.DistanceType == DistanceTypeEnum.Feet || range.DistanceType == DistanceTypeEnum.Miles)
 						range.Amount = json.GetValue<int>("range", "distance", "amount");
 				}
-				spell.RangeId = await SaveRange(range);
+				spell.Range = range;
 			}
 		}
 		private async Task GetSpellClasses(SpellDto spell)
@@ -282,48 +268,6 @@ namespace PortalQuest.Console.Commands
 				contents.AddRange(JTokenTools.ParseEntry(token));
 			}
 			spell.Content = JsonConvert.SerializeObject(contents);
-		}
-		private async Task<Guid> SaveTime(TimeDto time)
-		{
-			var saved = Times.FirstOrDefault(x => 
-				x.Type == time.Type
-				&& x.Amount == time.Amount
-				&& x.Condition == time.Condition
-			);
-			if (saved != null) 
-				return saved.Id;
-			var res = await mediator.Send(new UpsertTimeRequest() { Time = time});
-			saved = res.Result!;
-			Times.Add(saved);
-			return saved.Id;
-		}
-		private async Task<Guid> SaveDuration(DurationDto duration)
-		{
-			var saved = Durations.FirstOrDefault(x =>
-				x.TimeId == duration.TimeId
-				&& x.Type == duration.Type
-				&& x.Ends == duration.Ends
-			);
-			if (saved != null)
-				return saved.Id;
-			var res = await mediator.Send(new UpsertDurationRequest() { Duration = duration });
-			saved = res.Result!;
-			Durations.Add(saved);
-			return saved.Id;
-		}
-		private async Task<Guid> SaveRange(RangeDto range)
-		{
-			var saved = Ranges.FirstOrDefault(x =>
-				x.Type == range.Type
-				&& x.DistanceType == range.DistanceType
-				&& x.Amount == range.Amount
-			);
-			if (saved != null)
-				return saved.Id;
-			var res = await mediator.Send(new UpsertRangeRequest() { Range = range });
-			saved = res.Result!;
-			Ranges.Add(saved);
-			return saved.Id;
 		}
 	}		
 }

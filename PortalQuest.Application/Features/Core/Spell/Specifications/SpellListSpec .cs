@@ -1,18 +1,19 @@
 ﻿using System.Linq.Expressions;
 using PortalQuest.Application.DTOs.Core.Spells;
 using PortalQuest.Application.Specifications;
+using PortalQuest.Domain.Entities.Core.Translations;
 
 namespace PortalQuest.Application.Features.Core.Spell.Specifications
 {
-	public class SpellListSpec: BaseSpecification<Domain.Entities.Core.Spell>
+	public class SpellListSpec: TranslatableSpecification<Domain.Entities.Core.Spell, SpellTranslation>
 	{
-		public SpellListSpec(SpellListFilterDto filter)
+		public SpellListSpec(SpellListFilterDto filter) : base(filter.LanguageCode)
 		{
 			Expression<Func<Domain.Entities.Core.Spell, bool>> criteria =
 				s => 
 					!s.IsDeleted
 					&& (
-						string.IsNullOrEmpty(filter.Name) || s.Translations.Where(t => t.LanguageCode == filter.LanguageCode).Select(t => t.Name).Any(x => x.Contains(filter.Name))
+						string.IsNullOrEmpty(filter.Name) || s.Translations.First().Name.Contains(filter.Name)
 					)
 					&& (
 						filter.Classes.Count() == 0 || 
@@ -61,13 +62,9 @@ namespace PortalQuest.Application.Features.Core.Spell.Specifications
 				;
 			ApplyCriteria(criteria);
 
-			AddInclude(s => s.Translations.Where(t => t.LanguageCode == filter.LanguageCode));
 			AddInclude(s => s.Source);
 			AddInclude(s => s.SpellClasses);
-			AddInclude(s=> s.Range);
-			AddInclude(s=> s.CastingTime);
 			AddInclude(s=> s.Conditions);
-			AddInclude(s=> s.Duration);
 
 
 			bool desc = filter.Order?.StartsWith("-") ?? false;
@@ -83,13 +80,13 @@ namespace PortalQuest.Application.Features.Core.Spell.Specifications
 					orderBy = x => x.Level;
 					break;
 				case "CastingTime":
-					orderBy = x => x.CastingTime.First().Amount;
+					orderBy = x => x.CastingTimes.First().Amount;
 					break;
 				case "Ramge":
 					orderBy = x => x.Range.Amount;
 					break;
 				case "Duration":
-					orderBy = x => x.Duration.First().Time.Amount;
+					orderBy = x => x.Durations.First().Time.Amount;
 					break;
 				default:
 					orderBy = x => x.Translations.First().Name;
