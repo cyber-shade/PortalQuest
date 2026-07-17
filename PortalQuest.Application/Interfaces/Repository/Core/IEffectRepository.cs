@@ -4,7 +4,7 @@ using PortalQuest.Domain.Entities.Core.Translations;
 
 namespace PortalQuest.Application.Interfaces.Repository.Core
 {
-	public interface IEffectRepository : ITranslatableGenericRepository<Effect, EffectTranslation>
+	public interface IEffectRepository : IGenericRepository<Effect>
 	{
 	}
 }

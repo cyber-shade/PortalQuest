@@ -9,6 +9,5 @@ namespace PortalQuest.Domain.Entities.Core.Translations
 		public Guid OriginId { get; set; }
 		[ForeignKey(nameof(OriginId))]
 		public T Origin { get; set; }
-		public LanguageCodeEnum LanguageCode { get; set; }
 	}
 }
