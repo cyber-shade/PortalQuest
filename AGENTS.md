@@ -1,10 +1,109 @@
 # AGENTS.md - PortalQuest Backend
 
-This file gives AI assistants the context needed to work effectively on the PortalQuest backend. It was updated after scanning the repository on 2026-07-26.
+This file gives AI assistants the context needed to work effectively on the PortalQuest backend. It was revised on 2026-07-26 to make the product context easier to use while preserving the existing technical and architectural rules.
 
-## Project Overview
+## Agent Operating Principles
 
-PortalQuest is an early-stage fantasy RPG backend inspired by Dungeons & Dragons. The intended product includes a character builder, rules glossary, fight manager, AI assistant, official/SRD content, homebrew content, and bilingual rules data.
+- Scope changes tightly to the user request.
+- Preserve Clean Architecture, DDD, and CQRS boundaries.
+- Prefer existing project patterns over introducing new abstractions or libraries.
+- Treat local ignored files, generated files, and unrelated user changes as user-owned. Do not revert them.
+- Fix known rough edges only when they are directly in scope or required for correctness.
+- Do not perform the future .NET 10 upgrade or NoSQL database work unless the user explicitly asks for those tasks.
+
+## Product Context
+
+PortalQuest is an early-stage Dungeons & Dragons reference and gameplay backend. The first product goal is a bilingual rules reference site. Later phases expand toward character building, monster/lore content, user profiles, character state management, and AI-assisted dungeon-master workflows.
+
+The backend should be designed as a long-lived rules and gameplay platform, not only as a simple content catalog.
+
+## Product Roadmap Context
+
+The exact phase order may change, but the expected product areas are:
+
+### Phase 1 - D&D Rules Reference
+
+The first phase is a reference site for D&D rules content:
+
+- Spells
+- Items
+- Classes
+- Rules text
+- Other core game-reference content
+- English and Farsi presentation
+
+Current database structure and imported data are based on free data extracted from 5e.tools. The importer work belongs to `PortalQuest.Console`.
+
+Important bilingual behavior:
+
+- Spell names may remain the same as English.
+- Farsi descriptions should be easier and more natural for Farsi-speaking users.
+- Do not hardcode English-only rules structures where translated explanations are product requirements.
+
+The database structure must strongly support homebrew content alongside official/SRD/basic-rules content.
+
+### Phase 2 - Character Builder
+
+The next major product area is a powerful, fast, feature-rich bilingual character builder. It should be designed to become stronger than common D&D character-builder tools such as Aurora, especially in rules calculation.
+
+Expected character-builder qualities:
+
+- Fast character creation and editing
+- Rich feature support
+- Bilingual user-facing content
+- Strong rules calculations
+- Computable spell-slot/resource spending
+- Logical derivation of character stats, abilities, inventory effects, and combat-relevant state
+- A gameplay feel closer to Baldur's Gate-style character systems, where character mechanics are consistently computable
+
+### Phase 3 - Monsters, Setups, Lore, and RAG Content
+
+The project is expected to load monsters, well-known setups, and multiple lore sources.
+
+This content should be:
+
+- Searchable and discoverable by users
+- Stored with enough structure and provenance for later AI/RAG usage
+- Compatible with multiple lore sources or campaign settings
+- Kept separate from user-created homebrew unless intentionally linked
+
+### Phase 4 - User Profiles, Character Sheets, Backgrounds, and AI DM
+
+Users are expected to have profiles and saved characters.
+
+User-owned content may include:
+
+- Character creation and management
+- Character sheets
+- Character background stories
+- Character state and progression
+- User-authored campaign or roleplay context
+
+Character sheets and backgrounds should be structured so a future RAG layer can help an AI dungeon master use that data. The AI DM should be able to answer at different player knowledge levels and should be able to use rules, character, background, lore, and state data together.
+
+### Character Management Application
+
+Another expected product area is a character-management application, potentially web-based and possibly also a standalone application. This backend is responsible for supporting that application.
+
+This area is closer to Baldur's Gate 3 style character management:
+
+- Character health
+- Current status/effects
+- Inventory
+- Character and NPC management
+- DM access to manage player characters and NPCs
+- Shared state needed for gameplay and sessions
+
+Product-quality priorities:
+
+- Rules data must be trustworthy, source-aware, and edition-aware.
+- Official/SRD/basic-rules content must coexist with homebrew without being overwritten or mutated by user content.
+- Names alone are not reliable identifiers for rules content because editions, sources, and homebrew variants can overlap.
+- User-facing rules text should remain localizable.
+- Gameplay workflows should support both players and game masters, even when a specific role model has not been fully implemented yet.
+- AI-facing behavior should preserve provenance and avoid fabricating rules details when source data is missing.
+
+## Current Implementation Snapshot
 
 Current implemented source code is mostly focused on core rules content import and lookup:
 
@@ -57,6 +156,19 @@ PortalQuest follows Clean Architecture with DDD and CQRS.
 - Business logic belongs in `Domain` when it is an invariant, or in `Application` handlers when it is use-case orchestration.
 - Controllers should stay thin: HTTP input -> request DTO/command/query -> `IMediator.Send(...)` -> HTTP response.
 - Keep EF Core-specific behavior in `Persistence` where possible. Some existing domain classes use `[ForeignKey]`; avoid adding more persistence attributes unless you are intentionally following an existing local constraint.
+
+## Product-Aware Modeling Rules
+
+- Treat rules entities as long-lived product data, not just CRUD records.
+- Model source, edition, language, and ownership explicitly when they affect product behavior.
+- Preserve official/SRD/basic-rules provenance. Do not merge homebrew data into official records.
+- Prefer stable IDs and source metadata over name-based matching.
+- Keep descriptions, names, class features, spell text, item text, and rules text localizable.
+- When adding gameplay features, separate rules definitions from character/campaign state.
+- Character-builder and character-management features should be computable from rules, character choices, inventory, effects, and state rather than stored as opaque manual values whenever practical.
+- Store user-owned character sheets, backgrounds, and campaign state in a way that can later feed RAG/AI DM workflows without mixing private user data into global rules content.
+- When adding AI-assistant-facing features later, expose enough provenance for answers to cite or trace source content.
+- Keep monster, lore, setup, and campaign-setting data source-aware and searchable so it can support both direct user lookup and future vector/RAG indexing.
 
 ## Current CQRS Pattern
 
@@ -291,7 +403,7 @@ These are current repo facts, not necessarily desired end-state:
 
 When touching nearby code, fix rough edges only if they are in scope for the task or necessary to make the requested change correct. Avoid unrelated cleanup churn.
 
-## When Making Changes
+## Change Placement Guide
 
 Before editing, identify the layer:
 
@@ -303,5 +415,3 @@ Before editing, identify the layer:
 - JSON import/parsing/admin utility? `PortalQuest.Console`
 
 Keep changes scoped. If no existing pattern covers a new feature, choose a Clean Architecture/CQRS-compatible pattern and briefly call out the decision.
-
-Never revert unrelated user changes. This repository may have local ignored files and generated output.
