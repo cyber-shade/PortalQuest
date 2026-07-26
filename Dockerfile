@@ -1,5 +1,12 @@
-# ---- Stage 1: Build ----
+# This stage is used when running fast-mode debugging (e.g. Dev Containers / VS Code attach)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
+WORKDIR /app
+EXPOSE 8080
+
+# ---- Build stage ----
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy only the .csproj/.sln files first — this is the key caching trick
@@ -17,16 +24,16 @@ RUN dotnet restore PortalQuest.Web/PortalQuest.Web.csproj
 # Now copy the rest of the source code
 COPY . .
 
-# Publish the Web project
 WORKDIR /src/PortalQuest.Web
-# RUN dotnet publish -c Release -o /app/publish --no-restore
+RUN dotnet build PortalQuest.Web.csproj -c $BUILD_CONFIGURATION -o /app/build
 
-RUN dotnet publish -c Release -o /app/publish --no-restore -p:PublishAot=false
+# ---- Publish stage ----
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish PortalQuest.Web.csproj -c $BUILD_CONFIGURATION -o /app/publish -p:UseAppHost=false -p:PublishAot=false
 
-# ---- Stage 2: Runtime ----
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+# ---- Final stage (production image) ----
+FROM base AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-
-EXPOSE 8080
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "PortalQuest.Web.dll"]
